@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class Activity extends StatelessWidget {
   Activity({Key? key}) : super(key: key);
   final List<Map<String, dynamic>> data = [
-    {'type': "Investment", "title": "Item 1"},
-    {'type': "Personal", 'title': "Item 2"}
+    {'type': "Investment", "title": "Item 1", "timestamp": "12 Jul"},
+    {'type': "Personal", 'title': "Item 2", 'timestamp': "11 Jul"}
   ];
 
   @override
@@ -21,6 +21,7 @@ class Activity extends StatelessWidget {
             return ActivityCard(
               type: activityItem['type'],
               title: activityItem['title'],
+              timestamp: activityItem['timestamp'],
             );
           }),
     );
@@ -28,11 +29,16 @@ class Activity extends StatelessWidget {
 }
 
 class ActivityCard extends StatelessWidget {
-  const ActivityCard({Key? key, required this.type, required this.title})
+  const ActivityCard(
+      {Key? key,
+      required this.type,
+      required this.title,
+      required this.timestamp})
       : super(key: key);
 
   final String title;
   final String type;
+  final String timestamp;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +48,8 @@ class ActivityCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTile(
         leading: _getIcon(),
-        title: Text(
-          title,
-        ),
+        title: Text(title),
+        subtitle: Text(timestamp),
       ),
     );
   }
