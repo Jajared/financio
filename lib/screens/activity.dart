@@ -11,8 +11,15 @@ class Activity extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const Text('Recent Activity'),
+        title: const Text(
+          'Recent Activity',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+          ),
+        ),
       ),
       body: ListView.builder(
           itemCount: data.length,
@@ -48,7 +55,7 @@ class ActivityCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTile(
         leading: _getIcon(),
-        title: Text(title),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(timestamp),
       ),
     );
