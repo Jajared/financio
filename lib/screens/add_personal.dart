@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_tracker/firebase/activity_collection.dart';
+import 'package:finance_tracker/firebase/personal_collection.dart';
 import 'package:finance_tracker/models/activity_model.dart';
+import 'package:finance_tracker/models/personal_model.dart';
 import 'package:flutter/material.dart';
 
 class AddTransaction extends StatefulWidget {
@@ -15,7 +17,7 @@ class AddTransactionState extends State<AddTransaction> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  final List<CategoryItem> categories = [
+  final List<CategoryItem> expensesCategories = [
     CategoryItem('Transport', Icons.directions_car),
     CategoryItem('Food', Icons.restaurant),
     CategoryItem('Shopping', Icons.shopping_bag),
@@ -24,6 +26,11 @@ class AddTransactionState extends State<AddTransaction> {
     CategoryItem('Health', Icons.favorite),
     CategoryItem('Education', Icons.school),
     CategoryItem('Other', Icons.category),
+  ];
+
+  final List<CategoryItem> incomeCategories = [
+    CategoryItem('Income 1', Icons.attach_money),
+    CategoryItem('Income 2', Icons.attach_money),
   ];
 
   @override
@@ -112,7 +119,7 @@ class AddTransactionState extends State<AddTransaction> {
           selectedCategory = newValue;
         });
       },
-      items: categories.map((category) {
+      items: [...expensesCategories, ...incomeCategories].map((category) {
         return DropdownMenuItem<CategoryItem>(
           value: category,
           child: Row(
@@ -149,6 +156,9 @@ class AddTransactionState extends State<AddTransaction> {
     double amount;
     try {
       amount = double.parse(amountText);
+      if (expensesCategories.contains(selectedCategory)) {
+        amount = -amount;
+      }
     } catch (e) {
       // Handle case when the amount cannot be parsed to double
       ScaffoldMessenger.of(context).showSnackBar(
@@ -163,8 +173,15 @@ class AddTransactionState extends State<AddTransaction> {
       type: "Personal",
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
+    PersonalModel newPersonal = PersonalModel(
+      amount: amount,
+      category: selectedCategory!.name,
+      description: description,
+      timestamp: Timestamp.fromDate(DateTime.now()),
+    );
     try {
       ActivityCollection.instance.addActivity(newActivity);
+      PersonalCollection.instance.addPersonal(newPersonal);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

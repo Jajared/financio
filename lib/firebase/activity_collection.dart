@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class ActivityCollection extends GetxController {
   static ActivityCollection get instance => Get.find();
-  final activityRef = FirebaseFirestore.instance.collection('Events');
+  final activityRef = FirebaseFirestore.instance.collection('Activity');
 
   @override
   void onInit() {
@@ -14,7 +14,7 @@ class ActivityCollection extends GetxController {
 
   Future<void> addActivity(ActivityModel activity) async {
     final newActivityData = {
-      'activity': FieldValue.arrayUnion([activity.toJson()])
+      'events': FieldValue.arrayUnion([activity.toJson()])
     };
     return activityRef
         .doc("test")
@@ -24,7 +24,7 @@ class ActivityCollection extends GetxController {
   Future<List<ActivityModel>> getAllActivity() async {
     final snapshot = await activityRef.doc("test").get();
     final result = snapshot.data() as Map<String, dynamic>;
-    List<ActivityModel> activityData = result['activity']
+    List<ActivityModel> activityData = result['events']
         .map<ActivityModel>((item) => ActivityModel.fromJson(item))
         .toList();
     return activityData;
