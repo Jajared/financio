@@ -37,7 +37,8 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primaryColor: const Color.fromRGBO(3, 169, 66, 0.6),
       ),
-      home: Scaffold(
+      home: SafeArea(
+          child: Scaffold(
         body: _screens[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
@@ -65,7 +66,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
-      ),
+      )),
       debugShowCheckedModeBanner: false,
     );
   }

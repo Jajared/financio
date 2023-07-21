@@ -3,8 +3,8 @@ import 'package:finance_tracker/models/personal_model.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/screens/add_personal.dart';
 import 'package:intl/intl.dart';
-
 import '../widgets/personal_card.dart';
+import '../widgets/personal_chart.dart';
 
 class Personal extends StatelessWidget {
   const Personal({Key? key}) : super(key: key);
@@ -37,33 +37,45 @@ class Personal extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Container(
-            height: 200,
-            color: Colors.blueGrey,
-            // Add your graph widget here
+          const SizedBox(height: 250, child: PersonalChart()),
+          const Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                "Transactions",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
           Expanded(
-            child: FutureBuilder<List<PersonalModel>>(
-              future: PersonalCollection.instance.getAllPersonal(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  final data = snapshot.data!;
-                  final groupedTransactions = _groupTransactionsByDate(data);
-                  return ListView.separated(
-                    itemCount: groupedTransactions.length,
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final date = groupedTransactions.keys.elementAt(index);
-                      final transactions = groupedTransactions[date];
-                      return _buildTransactionGroup(date, transactions!);
-                    },
-                  );
-                }
-              },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: FutureBuilder<List<PersonalModel>>(
+                future: PersonalCollection.instance.getAllPersonal(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    final data = snapshot.data!;
+                    final groupedTransactions = _groupTransactionsByDate(data);
+                    return ListView.separated(
+                      itemCount: groupedTransactions.length,
+                      separatorBuilder: (context, index) => const Divider(),
+                      itemBuilder: (context, index) {
+                        final date = groupedTransactions.keys.elementAt(index);
+                        final transactions = groupedTransactions[date];
+                        return _buildTransactionGroup(date, transactions!);
+                      },
+                    );
+                  }
+                },
+              ),
             ),
           ),
         ],
