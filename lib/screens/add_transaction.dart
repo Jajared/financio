@@ -1,14 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finance_tracker/firebase/activity_collection.dart';
+import 'package:finance_tracker/models/activity_model.dart';
 import 'package:flutter/material.dart';
 
 class AddTransaction extends StatefulWidget {
   const AddTransaction({Key? key}) : super(key: key);
 
   @override
-  _AddTransactionState createState() => _AddTransactionState();
+  AddTransactionState createState() => AddTransactionState();
 }
 
-class _AddTransactionState extends State<AddTransaction> {
+class AddTransactionState extends State<AddTransaction> {
   CategoryItem? selectedCategory;
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   final List<CategoryItem> categories = [
     CategoryItem('Transport', Icons.directions_car),
@@ -45,11 +50,20 @@ class _AddTransactionState extends State<AddTransaction> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Implement your logic to handle the form submission here
-                // Access the selectedCategory to get the chosen category.
+                try {
+                  _saveTransaction();
+                  Navigator.pop(context);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Error saving transaction'),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Set the primary color to green
+                backgroundColor: const Color.fromRGBO(
+                    3, 169, 66, 0.6), // Set the primary color to green
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -66,6 +80,8 @@ class _AddTransactionState extends State<AddTransaction> {
   Widget _buildInputBox(String label, String hint,
       {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
     return TextField(
+      controller:
+          label == 'Amount' ? _amountController : _descriptionController,
       keyboardType: keyboardType,
       maxLines: maxLines,
       decoration: InputDecoration(
@@ -109,6 +125,53 @@ class _AddTransactionState extends State<AddTransaction> {
         );
       }).toList(),
     );
+  }
+
+  void _saveTransaction() {
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a category'),
+        ),
+      );
+      return;
+    }
+    String amountText = _amountController.text;
+    String description = _descriptionController.text;
+    if (amountText.isEmpty || description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+        ),
+      );
+      return;
+    }
+    double amount;
+    try {
+      amount = double.parse(amountText);
+    } catch (e) {
+      // Handle case when the amount cannot be parsed to double
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid amount'),
+        ),
+      );
+      return;
+    }
+    ActivityModel newActivity = ActivityModel(
+      title: description,
+      type: "Personal",
+      timestamp: Timestamp.fromDate(DateTime.now()),
+    );
+    try {
+      ActivityCollection.instance.addActivity(newActivity);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error saving transaction'),
+        ),
+      );
+    }
   }
 }
 

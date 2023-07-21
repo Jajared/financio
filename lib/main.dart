@@ -3,10 +3,13 @@ import 'package:finance_tracker/screens/personal.dart';
 import 'package:finance_tracker/screens/activity.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'firebase/activity_collection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  Get.put(ActivityCollection());
   runApp(const MyApp());
 }
 
@@ -20,9 +23,9 @@ class _MyAppState extends State<MyApp> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    Investments(),
+    const Investments(),
     const Personal(),
-    Activity(),
+    const Activity(),
   ];
 
   @override

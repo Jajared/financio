@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ActivityModel {
   final String title;
   final String type;
-  final dynamic timestamp; // Recheck for type
+  final Timestamp timestamp;
 
   ActivityModel(
       {required this.title, required this.type, required this.timestamp});
@@ -16,13 +16,11 @@ class ActivityModel {
     };
   }
 
-  factory ActivityModel.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> document) {
-    final data = document.data();
+  factory ActivityModel.fromJson(Map<String, dynamic> json) {
     return ActivityModel(
-      title: data!['title'],
-      type: data['type'],
-      timestamp: data['timestamp'],
+      title: json['title'],
+      type: json['type'],
+      timestamp: json['timestamp'],
     );
   }
 }

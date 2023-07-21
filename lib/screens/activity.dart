@@ -1,37 +1,50 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../firebase/activity_collection.dart';
+import '../models/activity_model.dart';
+import 'package:intl/intl.dart';
 
 class Activity extends StatelessWidget {
-  Activity({Key? key}) : super(key: key);
-  final List<Map<String, dynamic>> data = [
-    {'type': "Investment", "title": "Item 1", "timestamp": "12 Jul"},
-    {'type': "Personal", 'title': "Item 2", 'timestamp': "11 Jul"}
-  ];
+  const Activity({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          'Recent Activity',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: const Text(
+            'Recent Activity',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+            ),
           ),
         ),
-      ),
-      body: ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            final activityItem = data[index];
-            return ActivityCard(
-              type: activityItem['type'],
-              title: activityItem['title'],
-              timestamp: activityItem['timestamp'],
-            );
-          }),
-    );
+        body: Center(
+          child: FutureBuilder<List<ActivityModel>>(
+            future: ActivityCollection.instance.getAllActivity(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                final data = snapshot.data!;
+                return ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      final activityItem = data[index];
+                      return ActivityCard(
+                        type: activityItem.type,
+                        title: activityItem.title,
+                        timestamp: activityItem.timestamp,
+                      );
+                    });
+              }
+            },
+          ),
+        ));
   }
 }
 
@@ -45,7 +58,7 @@ class ActivityCard extends StatelessWidget {
 
   final String title;
   final String type;
-  final String timestamp;
+  final Timestamp timestamp;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +69,9 @@ class ActivityCard extends StatelessWidget {
       child: ListTile(
         leading: _getIcon(),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(timestamp),
+        subtitle: Text(
+          "${DateFormat('dd MMM').format(timestamp.toDate().toLocal())} at ${DateFormat('HH:mm').format(timestamp.toDate().toLocal())}",
+        ),
       ),
     );
   }

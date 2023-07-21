@@ -31,7 +31,8 @@ class AddInvestment extends StatelessWidget {
                 // Implement your logic to handle the form submission here
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Set the primary color to green
+                backgroundColor: const Color.fromRGBO(
+                    3, 169, 66, 0.6), // Set the primary color to green
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

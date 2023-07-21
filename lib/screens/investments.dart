@@ -3,22 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:finance_tracker/screens/add_investment.dart';
 
 class Investments extends StatelessWidget {
-  Investments({Key? key}) : super(key: key);
-
-  final List<InvestmentModel> mockData = [
-    InvestmentModel(
-      ticker: 'AAPL',
-      quantity: 10,
-      sharePrice: 100,
-      createdAt: DateTime.now(),
-    ),
-    InvestmentModel(
-      ticker: 'TSLA',
-      quantity: 5,
-      sharePrice: 200,
-      createdAt: DateTime.now(),
-    ),
-  ];
+  const Investments({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
