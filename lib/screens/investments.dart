@@ -14,13 +14,13 @@ class Investments extends StatelessWidget {
           title: const Text(
             'Investments',
             style: TextStyle(
-              color: Colors.black,
+              color: Color.fromRGBO(255, 255, 255, 0.96),
               fontSize: 20,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.add, color: Colors.black, size: 30),
+              icon: const Icon(Icons.add, color: Colors.white, size: 30),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -30,6 +30,7 @@ class Investments extends StatelessWidget {
               },
             ),
           ]),
+      backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
       body: const Center(child: Text('Investments')),
     );
   }

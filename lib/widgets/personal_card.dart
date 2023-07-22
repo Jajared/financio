@@ -18,13 +18,10 @@ class PersonalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: const Color.fromRGBO(27, 27, 27, 1),
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(
-          color: Colors.grey.shade300,
-          width: 1,
-        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -41,16 +38,16 @@ class PersonalCard extends StatelessWidget {
                     Text(
                       category,
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(255, 255, 255, 0.96)),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.grey,
+                        color: Color.fromRGBO(255, 255, 255, 0.67),
                       ),
                     ),
                   ],
@@ -76,23 +73,23 @@ class PersonalCard extends StatelessWidget {
   Widget _buildIcon(String category) {
     switch (category) {
       case 'Transport':
-        return const Icon(Icons.directions_car, size: 26);
+        return const Icon(Icons.directions_car, size: 26, color: Colors.blue);
       case 'Food':
-        return const Icon(Icons.restaurant, size: 26);
+        return const Icon(Icons.restaurant, size: 26, color: Colors.red);
       case 'Shopping':
-        return const Icon(Icons.shopping_bag, size: 26);
+        return const Icon(Icons.shopping_bag, size: 26, color: Colors.orange);
       case 'Entertainment':
-        return const Icon(Icons.movie, size: 26);
+        return const Icon(Icons.movie, size: 26, color: Colors.purple);
       case 'Travel':
-        return const Icon(Icons.flight, size: 26);
+        return const Icon(Icons.flight, size: 26, color: Colors.yellow);
       case 'Health':
-        return const Icon(Icons.favorite, size: 26);
+        return const Icon(Icons.favorite, size: 26, color: Colors.pink);
       case 'Education':
-        return const Icon(Icons.school, size: 26);
+        return const Icon(Icons.school, size: 26, color: Colors.green);
       case 'Other':
-        return const Icon(Icons.category, size: 26);
+        return const Icon(Icons.category, size: 26, color: Colors.grey);
       default:
-        return const Icon(Icons.category, size: 26);
+        return const Icon(Icons.category, size: 26, color: Colors.grey);
     }
   }
 }

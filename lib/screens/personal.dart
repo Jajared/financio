@@ -18,13 +18,13 @@ class Personal extends StatelessWidget {
         title: const Text(
           'Personal',
           style: TextStyle(
-            color: Colors.black,
+            color: Color.fromRGBO(255, 255, 255, 0.96),
             fontSize: 20,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black, size: 30),
+            icon: const Icon(Icons.add, color: Colors.white, size: 30),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -35,6 +35,7 @@ class Personal extends StatelessWidget {
           ),
         ],
       ),
+      backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
       body: Column(
         children: [
           const SizedBox(height: 250, child: PersonalChart()),
@@ -45,9 +46,9 @@ class Personal extends StatelessWidget {
               child: Text(
                 "Transactions",
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(255, 255, 255, 0.96)),
               ),
             ),
           ),
@@ -58,7 +59,8 @@ class Personal extends StatelessWidget {
                 future: PersonalCollection.instance.getAllPersonal(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const CircularProgressIndicator(
+                        color: Color.fromRGBO(198, 81, 205, 1));
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
@@ -115,9 +117,9 @@ class Personal extends StatelessWidget {
           child: Text(
             formattedDate,
             style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color.fromRGBO(255, 255, 255, 0.67)),
           ),
         ),
         ListView.builder(

@@ -30,21 +30,42 @@ class _MyAppState extends State<MyApp> {
     const Activity(),
   ];
 
+  final ThemeData customTheme = ThemeData(
+    primaryColor: const Color.fromRGBO(16, 16, 16, 1),
+    inputDecorationTheme: InputDecorationTheme(
+      labelStyle: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.67)),
+      hintStyle: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.67)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide:
+            const BorderSide(color: Color.fromRGBO(36, 36, 36, 1), width: 2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide:
+            const BorderSide(color: Color.fromRGBO(36, 36, 36, 1), width: 2),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Finance Tracker',
-      theme: ThemeData(
-        primaryColor: const Color.fromRGBO(3, 169, 66, 0.6),
-      ),
+      theme: customTheme,
       home: SafeArea(
           child: Scaffold(
         body: _screens[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
+          unselectedIconTheme: const IconThemeData(
+            color: Color.fromRGBO(255, 255, 255, 0.45),
+          ),
+          unselectedItemColor: const Color.fromRGBO(255, 255, 255, 0.45),
+          backgroundColor: const Color.fromRGBO(16, 16, 16, 0.98),
           selectedIconTheme:
-              const IconThemeData(color: Color.fromRGBO(3, 169, 66, 0.6)),
-          selectedItemColor: const Color.fromRGBO(3, 169, 66, 0.6),
+              const IconThemeData(color: Color.fromRGBO(198, 81, 205, 1)),
+          selectedItemColor: const Color.fromRGBO(198, 81, 205, 1),
           currentIndex: _currentIndex,
           onTap: (index) {
             setState(() {

@@ -18,19 +18,19 @@ class AddTransactionState extends State<AddTransaction> {
   final TextEditingController _descriptionController = TextEditingController();
 
   final List<CategoryItem> expensesCategories = [
-    CategoryItem('Transport', Icons.directions_car),
-    CategoryItem('Food', Icons.restaurant),
-    CategoryItem('Shopping', Icons.shopping_bag),
-    CategoryItem('Entertainment', Icons.movie),
-    CategoryItem('Travel', Icons.flight),
-    CategoryItem('Health', Icons.favorite),
-    CategoryItem('Education', Icons.school),
-    CategoryItem('Other', Icons.category),
+    CategoryItem('Transport', Icons.directions_car, Colors.blue),
+    CategoryItem('Food', Icons.restaurant, Colors.orange),
+    CategoryItem('Shopping', Icons.shopping_bag, Colors.red),
+    CategoryItem('Entertainment', Icons.movie, Colors.purple),
+    CategoryItem('Travel', Icons.flight, Colors.yellow),
+    CategoryItem('Health', Icons.favorite, Colors.pink),
+    CategoryItem('Education', Icons.school, Colors.green),
+    CategoryItem('Other', Icons.category, Colors.grey),
   ];
 
   final List<CategoryItem> incomeCategories = [
-    CategoryItem('Income 1', Icons.attach_money),
-    CategoryItem('Income 2', Icons.attach_money),
+    CategoryItem('Income 1', Icons.attach_money, Colors.green),
+    CategoryItem('Income 2', Icons.attach_money, Colors.green),
   ];
 
   @override
@@ -40,9 +40,10 @@ class AddTransactionState extends State<AddTransaction> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: const Text('Add Transaction',
-            style: TextStyle(color: Colors.black)),
-        iconTheme: const IconThemeData(color: Colors.black),
+            style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.96))),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+      backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -91,6 +92,7 @@ class AddTransactionState extends State<AddTransaction> {
           label == 'Amount' ? _amountController : _descriptionController,
       keyboardType: keyboardType,
       maxLines: maxLines,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -106,8 +108,10 @@ class AddTransactionState extends State<AddTransaction> {
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField<CategoryItem>(
       value: selectedCategory,
+      dropdownColor: const Color.fromRGBO(27, 27, 27, 1),
       decoration: InputDecoration(
         labelText: 'Category',
+        hintText: 'Select category',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -124,9 +128,9 @@ class AddTransactionState extends State<AddTransaction> {
           value: category,
           child: Row(
             children: [
-              Icon(category.icon),
+              Icon(category.icon, color: category.color),
               const SizedBox(width: 8),
-              Text(category.name),
+              Text(category.name, style: const TextStyle(color: Colors.white)),
             ],
           ),
         );
@@ -195,6 +199,7 @@ class AddTransactionState extends State<AddTransaction> {
 class CategoryItem {
   final String name;
   final IconData icon;
+  final Color color;
 
-  CategoryItem(this.name, this.icon);
+  CategoryItem(this.name, this.icon, this.color);
 }
