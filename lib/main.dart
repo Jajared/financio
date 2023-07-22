@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'firebase/activity_collection.dart';
 import 'firebase/personal_collection.dart';
+import 'firebase/investment_collection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Get.put(ActivityCollection());
   Get.put(PersonalCollection());
+  Get.put(InvestmentCollection());
   runApp(const MyApp());
 }
 
@@ -34,7 +36,7 @@ class _MyAppState extends State<MyApp> {
     primaryColor: const Color.fromRGBO(16, 16, 16, 1),
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.67)),
-      hintStyle: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.67)),
+      hintStyle: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.98)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide:
