@@ -62,7 +62,6 @@ class Investments extends StatelessWidget {
                   return Text('Error: ${snapshot.error}');
                 } else {
                   final data = snapshot.data!;
-                  print(data);
                   return ListView.builder(
                     itemCount: data.length,
                     itemBuilder: (context, index) {

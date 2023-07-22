@@ -31,7 +31,7 @@ class Activity extends StatelessWidget {
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
-                final data = snapshot.data!;
+                final data = snapshot.data!.reversed.toList();
                 return ListView.builder(
                     itemCount: data.length,
                     itemBuilder: (context, index) {

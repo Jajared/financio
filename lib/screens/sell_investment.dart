@@ -5,25 +5,27 @@ import 'package:finance_tracker/models/investment_model.dart';
 import 'package:finance_tracker/models/activity_model.dart';
 import 'package:flutter/material.dart';
 
-class AddInvestment extends StatefulWidget {
-  const AddInvestment({Key? key}) : super(key: key);
+class SellInvestment extends StatefulWidget {
+  final String ticker;
+  const SellInvestment({Key? key, required this.ticker}) : super(key: key);
 
   @override
-  AddInvestmentState createState() => AddInvestmentState();
+  SellInvestmentState createState() => SellInvestmentState();
 }
 
-class AddInvestmentState extends State<AddInvestment> {
+class SellInvestmentState extends State<SellInvestment> {
   final TextEditingController _tickerController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    String ticker = widget.ticker;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const Text('Add Investment',
+        title: const Text('Sell Investment',
             style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.96))),
         iconTheme:
             const IconThemeData(color: Color.fromRGBO(255, 255, 255, 0.96)),
@@ -34,7 +36,7 @@ class AddInvestmentState extends State<AddInvestment> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _inputBox('Ticker', 'Enter ticker'),
+            _inputBox(ticker, 'Enter ticker'),
             const SizedBox(height: 16),
             _inputBox('Quantity', 'Enter amount',
                 keyboardType: TextInputType.number),

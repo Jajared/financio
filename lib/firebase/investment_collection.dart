@@ -12,7 +12,7 @@ class InvestmentCollection extends GetxController {
     getAllInvestment();
   }
 
-  Future<void> addPersonal(InvestmentModel event) async {
+  Future<void> addInvestment(InvestmentModel event) async {
     final newPersonalData = {
       'events': FieldValue.arrayUnion([event.toJson()])
     };
