@@ -37,7 +37,7 @@ class _InvestmentSummaryState extends State<InvestmentSummary> {
           const Text(
             'Portfolio Value',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -46,7 +46,7 @@ class _InvestmentSummaryState extends State<InvestmentSummary> {
           Text(
             '\$${widget.balance.toStringAsFixed(2)}',
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -55,7 +55,7 @@ class _InvestmentSummaryState extends State<InvestmentSummary> {
           const Text(
             'Profit',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

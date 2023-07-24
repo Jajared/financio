@@ -37,7 +37,7 @@ class InvestmentChartState extends State<InvestmentChart> {
             ),
           ),
         ),
-        SizedBox(
+        /* SizedBox(
           width: 60,
           height: 34,
           child: TextButton(
@@ -54,7 +54,7 @@ class InvestmentChartState extends State<InvestmentChart> {
               ),
             ),
           ),
-        ),
+        ), **/
       ],
     );
   }
@@ -65,25 +65,12 @@ class InvestmentChartState extends State<InvestmentChart> {
       fontSize: 16,
       color: Color.fromRGBO(255, 255, 255, 0.67),
     );
-    Widget text;
-    switch (value.toInt()) {
-      case 2:
-        text = const Text('MAR', style: style);
-        break;
-      case 5:
-        text = const Text('JUN', style: style);
-        break;
-      case 8:
-        text = const Text('SEP', style: style);
-        break;
-      default:
-        text = const Text('', style: style);
-        break;
-    }
-
+    DateTime currentDate = DateTime.now();
+    DateTime day = currentDate.subtract(Duration(days: 6 - value.toInt()));
+    String text = '${day.day}/${day.month}';
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      child: text,
+      child: Text(text, style: style),
     );
   }
 
@@ -93,25 +80,22 @@ class InvestmentChartState extends State<InvestmentChart> {
       fontSize: 15,
       color: Color.fromRGBO(255, 255, 255, 0.67),
     );
+
     String text;
-    switch (value.toInt()) {
-      case 1:
-        text = '10K';
-        break;
-      case 3:
-        text = '30k';
-        break;
-      case 5:
-        text = '50k';
-        break;
-      default:
-        return Container();
+    if (value < 1000) {
+      text = '${value.toInt()}k';
+    } else if (value < 1000000) {
+      text = '${(value / 1000).toStringAsFixed(2)}k';
+    } else {
+      text = '${(value / 1000000).toStringAsFixed(2)}M';
     }
 
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
   LineChartData mainData() {
+    LineChartBarData lineChartBarData =
+        convertToLineChartBarData(widget.graphData);
     return LineChartData(
       gridData: FlGridData(
         show: false,
@@ -161,43 +145,19 @@ class InvestmentChartState extends State<InvestmentChart> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 11,
+      maxX: 6,
       minY: 0,
-      maxY: 6,
+      maxY: 4,
       lineBarsData: [
-        LineChartBarData(
-          spots: const [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
-          ],
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: gradientColors,
-          ),
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: gradientColors
-                  .map((color) => color.withOpacity(0.3))
-                  .toList(),
-            ),
-          ),
-        ),
+        lineChartBarData,
       ],
     );
   }
 
   LineChartData avgData() {
+    LineChartBarData lineChartBarData =
+        convertToLineChartBarData(widget.graphData);
+
     return LineChartData(
       lineTouchData: const LineTouchData(enabled: false),
       gridData: FlGridData(
@@ -248,49 +208,45 @@ class InvestmentChartState extends State<InvestmentChart> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 11,
+      maxX: 6,
       minY: 0,
-      maxY: 6,
+      maxY: 4,
       lineBarsData: [
-        LineChartBarData(
-          spots: const [
-            FlSpot(0, 3.44),
-            FlSpot(2.6, 3.44),
-            FlSpot(4.9, 3.44),
-            FlSpot(6.8, 3.44),
-            FlSpot(8, 3.44),
-            FlSpot(9.5, 3.44),
-            FlSpot(11, 3.44),
-          ],
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: [
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                  .lerp(0.2)!,
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                  .lerp(0.2)!,
-            ],
-          ),
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                    .lerp(0.2)!
-                    .withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                    .lerp(0.2)!
-                    .withOpacity(0.1),
-              ],
-            ),
-          ),
-        ),
+        lineChartBarData,
       ],
+    );
+  }
+
+  LineChartBarData convertToLineChartBarData(List<dynamic> graphData) {
+    List<FlSpot> spots = [];
+    int startIndex =
+        graphData.length > 7 ? graphData.length - 7 : graphData.length - 1;
+    for (int i = startIndex; i >= 0; i--) {
+      double value = graphData[i]['value'].toDouble();
+      FlSpot spot = FlSpot((6 + i - startIndex).toDouble(), value / 1000);
+      spots.insert(0, spot);
+    }
+
+    while (spots.length < 7) {
+      spots.insert(0, FlSpot((6 - spots.length).toDouble(), 0));
+    }
+
+    return LineChartBarData(
+      spots: spots,
+      isCurved: false,
+      gradient: LinearGradient(
+        colors: gradientColors,
+      ),
+      barWidth: 5,
+      isStrokeCapRound: true,
+      dotData: const FlDotData(show: false),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors:
+              gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+        ),
+      ),
     );
   }
 }
