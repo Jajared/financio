@@ -15,6 +15,7 @@ class Investments extends StatefulWidget {
 
 class _InvestmentsState extends State<Investments> {
   List<InvestmentModel> investmentData = [];
+  List<dynamic> graphData = [];
   var totalValue = 0.0;
   var profit = 0.0;
 
@@ -29,11 +30,29 @@ class _InvestmentsState extends State<Investments> {
     try {
       final result = await InvestmentCollection.instance.getSummary();
       setState(() {
-        totalValue = result['total_value'].toDouble();
+        totalValue = result['graphData'].last["value"].toDouble();
         profit = result['profit'].toDouble();
+        graphData = result['graphData'];
       });
     } catch (e) {
-      print(e);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text(
+                "An error occurred while fetching investment summary data."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -44,7 +63,24 @@ class _InvestmentsState extends State<Investments> {
         investmentData = result;
       });
     } catch (e) {
-      print(e);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content:
+                const Text("An error occurred while fetching investment data."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -70,7 +106,7 @@ class _InvestmentsState extends State<Investments> {
               balance: totalValue,
               profit: profit,
             ),
-            const SizedBox(height: 250, child: InvestmentChart()),
+            SizedBox(height: 250, child: InvestmentChart(graphData: graphData)),
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(

@@ -17,7 +17,7 @@ class InvestmentModel {
       InvestmentModel(
         ticker: json["ticker"],
         quantity: json["quantity"],
-        sharePrice: json["sharePrice"],
+        sharePrice: json["sharePrice"].toDouble(),
         timestamp: json["createdAt"],
       );
 

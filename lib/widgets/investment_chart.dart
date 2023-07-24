@@ -2,7 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class InvestmentChart extends StatefulWidget {
-  const InvestmentChart({super.key});
+  final List<dynamic> graphData;
+  const InvestmentChart({
+    Key? key,
+    required this.graphData,
+  }) : super(key: key);
 
   @override
   State<InvestmentChart> createState() => InvestmentChartState();

@@ -18,14 +18,43 @@ class InvestmentCollection extends GetxController {
 
     // Calculate new summary
     double eventValue = event.sharePrice * event.quantity;
-    double newTotalValue = currentData['summary']['total_value'] + eventValue;
+    double newTotalValue =
+        currentData['summary']['graphData'].last['value'].toDouble() +
+            eventValue;
+
+    // Get current date and convert the Timestamp to a DateTime object
+    Timestamp currentTimestamp = Timestamp.now();
+    DateTime currentDate = currentTimestamp.toDate();
+    DateTime midnightDate = DateTime(
+        currentDate.year, currentDate.month, currentDate.day, 0, 0, 0, 0, 0);
+
+    List<dynamic> currentGraphData = currentData['summary']['graphData'];
+    // Check if the last date entry is the same as the current date
+    if (currentGraphData.isNotEmpty) {
+      Map<String, dynamic> lastEntry = currentGraphData.last;
+      if (lastEntry['date'].toDate() == midnightDate) {
+        lastEntry['value'] = newTotalValue;
+      } else {
+        Map<String, dynamic> newGraphEntry = {
+          'date': Timestamp.fromDate(midnightDate),
+          'value': newTotalValue,
+        };
+        currentData['summary']['graphData'].add(newGraphEntry);
+      }
+    } else {
+      // If there is no entry, add a new entry
+      Map<String, dynamic> newGraphEntry = {
+        'date': Timestamp.fromDate(midnightDate),
+        'value': newTotalValue,
+      };
+      currentData['summary']['graphData'].add(newGraphEntry);
+    }
 
     Map<String, dynamic> newInvestmentData = {
       'events': FieldValue.arrayUnion([event.toJson()]),
-      'summary': {
-        'total_value': newTotalValue,
-      }
+      'summary': currentData['summary'],
     };
+
     return investmentRef
         .doc("test")
         .set(newInvestmentData, SetOptions(merge: true));

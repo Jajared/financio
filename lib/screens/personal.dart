@@ -30,7 +30,24 @@ class _PersonalState extends State<Personal> {
         transactionData = result;
       });
     } catch (e) {
-      print(e);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text(
+                "An error occurred while fetching personal transaction data."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 

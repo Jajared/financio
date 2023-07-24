@@ -74,23 +74,26 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
         total += value.toDouble();
       });
       categoryMap.forEach((key, value) {
-        sections.add(PieChartSectionData(
-          color: sectionColors[key],
-          value: value / total * 100,
-          title: value.toString(),
-          radius: 100,
-          titleStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Color.fromRGBO(255, 255, 255, 0.96),
-          ),
-          badgeWidget: _Badge(
-            key,
-            size: 40,
-            borderColor: Colors.black,
-          ),
-          badgePositionPercentageOffset: .98,
-        ));
+        // Add only expenses (income will be handled later)
+        if (value < 0) {
+          sections.add(PieChartSectionData(
+            color: sectionColors[key],
+            value: value / total * 100,
+            title: value.toString(),
+            radius: 100,
+            titleStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(255, 255, 255, 0.96),
+            ),
+            badgeWidget: _Badge(
+              key,
+              size: 40,
+              borderColor: Colors.black,
+            ),
+            badgePositionPercentageOffset: .98,
+          ));
+        }
       });
       return sections;
     }
@@ -102,14 +105,14 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 20.0 : 16.0;
       final radius = isTouched ? 110.0 : 100.0;
-      final widgetSize = isTouched ? 55.0 : 40.0;
+      // final widgetSize = isTouched ? 55.0 : 40.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
 
       return PieChartSectionData(
         color: sections[i].color,
         value: sections[i].value,
-        title: sections[i].value.toStringAsFixed(2) +
-            '%', // Use the value from sections
+        title:
+            '${sections[i].value.toStringAsFixed(2)}%', // Use the value from sections
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,
@@ -143,7 +146,7 @@ class _Badge extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: Color.fromRGBO(56, 56, 56, 1),
+          color: const Color.fromRGBO(56, 56, 56, 1),
           shape: BoxShape.circle,
           border: Border.all(
             color: borderColor,
