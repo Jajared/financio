@@ -15,7 +15,7 @@ class PersonalModel {
 
   factory PersonalModel.fromJson(Map<String, dynamic> json) => PersonalModel(
         category: json["category"],
-        amount: json["amount"],
+        amount: json["amount"].toDouble(),
         description: json["description"],
         timestamp: json["createdAt"],
       );

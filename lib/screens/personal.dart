@@ -7,8 +7,32 @@ import 'package:intl/intl.dart';
 import '../widgets/personal_card.dart';
 import '../widgets/personal_chart.dart';
 
-class Personal extends StatelessWidget {
+class Personal extends StatefulWidget {
   const Personal({Key? key}) : super(key: key);
+
+  @override
+  _PersonalState createState() => _PersonalState();
+}
+
+class _PersonalState extends State<Personal> {
+  List<PersonalModel> transactionData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getTransactionData();
+  }
+
+  Future<void> _getTransactionData() async {
+    try {
+      final result = await PersonalCollection.instance.getAllPersonal();
+      setState(() {
+        transactionData = result;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,52 +49,44 @@ class Personal extends StatelessWidget {
         ),
       ),
       backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
-      body: Column(
-        children: [
-          const SizedBox(height: 250, child: PersonalChart()),
-          const SizedBox(height: 200, child: PersonalCategoryChart()),
-          const Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                "Transactions",
-                style: TextStyle(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 200, child: PersonalChart()),
+            SizedBox(
+                height: 250,
+                child: PersonalCategoryChart(transactionData: transactionData)),
+            const Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text(
+                  "Positions",
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(255, 255, 255, 0.96)),
+                    color: Color.fromRGBO(255, 255, 255, 0.96),
+                  ),
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: FutureBuilder<List<PersonalModel>>(
-                future: PersonalCollection.instance.getAllPersonal(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator(
-                        color: Color.fromRGBO(198, 81, 205, 1));
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final data = snapshot.data!;
-                    final groupedTransactions = _groupTransactionsByDate(data);
-                    return ListView.separated(
-                      itemCount: groupedTransactions.length,
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemBuilder: (context, index) {
-                        final date = groupedTransactions.keys.elementAt(index);
-                        final transactions = groupedTransactions[date];
-                        return _buildTransactionGroup(date, transactions!);
-                      },
-                    );
-                  }
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _groupTransactionsByDate(transactionData).length,
+                itemBuilder: (context, index) {
+                  final groupedData = _groupTransactionsByDate(transactionData);
+                  final date = groupedData.keys.elementAt(index);
+                  final transactions = groupedData[date]!;
+                  return _buildTransactionGroup(date, transactions);
                 },
+                separatorBuilder: (context, index) => const Divider(),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {

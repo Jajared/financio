@@ -63,31 +63,33 @@ class _InvestmentsState extends State<Investments> {
         ),
       ),
       backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
-      body: Column(
-        children: [
-          InvestmentSummary(
-            balance: totalValue,
-            profit: profit,
-          ),
-          const SizedBox(height: 250, child: InvestmentChart()),
-          const Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                "Positions",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(255, 255, 255, 0.96),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            InvestmentSummary(
+              balance: totalValue,
+              profit: profit,
+            ),
+            const SizedBox(height: 250, child: InvestmentChart()),
+            const Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text(
+                  "Positions",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(255, 255, 255, 0.96),
+                  ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: investmentData.length,
                 itemBuilder: (context, index) {
                   return InvestmentCard(
@@ -98,8 +100,8 @@ class _InvestmentsState extends State<Investments> {
                 },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
