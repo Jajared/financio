@@ -1,5 +1,6 @@
 import 'package:finance_tracker/firebase/personal_collection.dart';
 import 'package:finance_tracker/models/personal_model.dart';
+import 'package:finance_tracker/widgets/personal_category_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/screens/add_personal.dart';
 import 'package:intl/intl.dart';
@@ -22,23 +23,12 @@ class Personal extends StatelessWidget {
             fontSize: 20,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white, size: 30),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddTransaction(),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
       body: Column(
         children: [
           const SizedBox(height: 250, child: PersonalChart()),
+          const SizedBox(height: 200, child: PersonalCategoryChart()),
           const Align(
             alignment: Alignment.topLeft,
             child: Padding(
@@ -82,6 +72,18 @@ class Personal extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Navigate to the page where you want to add a new transaction
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const AddTransaction(),
+              ),
+            );
+          },
+          backgroundColor: const Color.fromRGBO(135, 57, 249, 1),
+          mini: true,
+          child: const Icon(Icons.add)),
     );
   }
 

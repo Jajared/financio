@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class InvestmentCollection extends GetxController {
   static InvestmentCollection get instance => Get.find();
-  final activityRef = FirebaseFirestore.instance.collection('Investments');
+  final investmentRef = FirebaseFirestore.instance.collection('Investments');
 
   @override
   void onInit() {
@@ -13,16 +13,52 @@ class InvestmentCollection extends GetxController {
   }
 
   Future<void> addInvestment(InvestmentModel event) async {
-    final newPersonalData = {
-      'events': FieldValue.arrayUnion([event.toJson()])
+    DocumentSnapshot snapshot = await investmentRef.doc("test").get();
+    Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
+
+    // Calculate new summary
+    double eventValue = event.sharePrice * event.quantity;
+    double newTotalValue = currentData['summary']['total_value'] + eventValue;
+
+    Map<String, dynamic> newInvestmentData = {
+      'events': FieldValue.arrayUnion([event.toJson()]),
+      'summary': {
+        'total_value': newTotalValue,
+      }
     };
-    return activityRef
+    return investmentRef
         .doc("test")
-        .set(newPersonalData, SetOptions(merge: true));
+        .set(newInvestmentData, SetOptions(merge: true));
+  }
+
+  Future<void> sellInvestment(InvestmentModel event) async {
+    DocumentSnapshot snapshot = await investmentRef.doc("test").get();
+    Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
+
+    // Calculate new summary
+    double eventValue = event.sharePrice * event.quantity;
+    double newTotalValue = currentData['summary']['total_value'] - eventValue;
+
+    // Check again
+    Map<String, dynamic> newInvestmentData = {
+      'events': FieldValue.arrayRemove([event.toJson()]),
+      'summary': {
+        'total_value': newTotalValue,
+      }
+    };
+    return investmentRef
+        .doc("test")
+        .set(newInvestmentData, SetOptions(merge: true));
+  }
+
+  getSummary() async {
+    final snapshot = await investmentRef.doc("test").get();
+    final result = snapshot.data() as Map<String, dynamic>;
+    return result['summary'];
   }
 
   Future<List<InvestmentModel>> getAllInvestment() async {
-    final snapshot = await activityRef.doc("test").get();
+    final snapshot = await investmentRef.doc("test").get();
     final result = snapshot.data() as Map<String, dynamic>;
     List<InvestmentModel> activityData = result['events']
         .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
