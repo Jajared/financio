@@ -1,6 +1,7 @@
 import 'package:finance_tracker/firebase/personal_collection.dart';
 import 'package:finance_tracker/models/personal_model.dart';
-import 'package:finance_tracker/widgets/personal_category_chart.dart';
+import 'package:finance_tracker/widgets/custom_button.dart';
+import 'package:finance_tracker/screens/personal_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/screens/add_personal.dart';
 import 'package:intl/intl.dart';
@@ -78,9 +79,17 @@ class _PersonalState extends State<Personal> {
             SizedBox(
                 height: 200,
                 child: PersonalChart(transactionData: transactionData)),
-            SizedBox(
-                height: 250,
-                child: PersonalCategoryChart(transactionData: transactionData)),
+            CustomButton(
+                icon: Icons.pie_chart,
+                title: "Statistics",
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PersonalStatistics(transactionData: transactionData),
+                    ),
+                  );
+                }),
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(

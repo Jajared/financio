@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 class CustomButton extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onPressed;
 
   const CustomButton({
+    Key? key,
     required this.icon,
     required this.title,
     required this.onPressed,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,7 @@ class CustomButton extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 30,
+              size: 26,
               color: Colors.white, // Change the icon color as needed
             ),
             const SizedBox(height: 8),

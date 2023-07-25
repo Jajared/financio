@@ -119,7 +119,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
 
     return List.generate(sections.length, (i) {
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 20.0 : 16.0;
+      final fontSize = isTouched ? 18.0 : 16.0;
       final radius = isTouched ? 110.0 : 100.0;
       // final widgetSize = isTouched ? 55.0 : 40.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
@@ -127,8 +127,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       return PieChartSectionData(
         color: sections[i].color,
         value: sections[i].value,
-        title:
-            '${sections[i].value.toStringAsFixed(2)}%', // Use the value from sections
+        title: '${sections[i].value.toStringAsFixed(2)}%',
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,
@@ -136,10 +135,10 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
           color: const Color(0xffffffff),
           shadows: shadows,
         ),
-        badgeWidget:
-            sections[i].badgeWidget, // Use the badgeWidget from sections
-        badgePositionPercentageOffset: sections[i]
-            .badgePositionPercentageOffset, // Use the badgePositionPercentageOffset from sections
+        badgeWidget: sections[i].badgeWidget,
+        badgePositionPercentageOffset:
+            sections[i].badgePositionPercentageOffset,
+        titlePositionPercentageOffset: 0.55,
       );
     });
   }

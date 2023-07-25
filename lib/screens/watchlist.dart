@@ -37,12 +37,13 @@ class StockWatchList extends StatelessWidget {
               child: ListTile(
                 title: Text(
                   item.name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 subtitle: Text(item.symbol),
-                trailing: Icon(Icons.arrow_forward_ios), // Add a trailing icon
+                trailing:
+                    const Icon(Icons.arrow_forward_ios), // Add a trailing icon
                 onTap: () {
                   // Implement the navigation to the detail page here
                   // For example, you can use Navigator.push to navigate to the detail page.

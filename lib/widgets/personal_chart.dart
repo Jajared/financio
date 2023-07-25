@@ -16,7 +16,7 @@ class PersonalChart extends StatefulWidget {
 
 class PersonalChartState extends State<PersonalChart> {
   final double width = 7;
-  final double maxY = 200;
+  double maxY = 50;
 
   late List<BarChartGroupData> rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
@@ -30,120 +30,138 @@ class PersonalChartState extends State<PersonalChart> {
 
   @override
   Widget build(BuildContext context) {
-    rawBarGroups = convertTransactionToChartData(widget.transactionData);
-    showingBarGroups = rawBarGroups;
-    return AspectRatio(
-      aspectRatio: 1.7,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-              child: BarChart(
-                BarChartData(
-                  maxY: maxY,
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
-                      tooltipBgColor: Colors.grey,
-                      getTooltipItem: (a, b, c, d) => null,
-                    ),
-                    touchCallback: (FlTouchEvent event, response) {
-                      if (response == null || response.spot == null) {
-                        setState(() {
-                          touchedGroupIndex = -1;
-                          showingBarGroups = List.of(rawBarGroups);
-                        });
-                        return;
-                      }
+    return FutureBuilder<List<BarChartGroupData>>(
+      future: _prepareChartData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // While waiting for the futures to complete, show a loading indicator.
+          return const Center(
+              child: CircularProgressIndicator(
+                  color: Color.fromRGBO(135, 57, 249, 1)));
+        } else if (snapshot.hasError) {
+          // If an error occurred while fetching data, display an error message.
+          return const Center(child: Text('Error loading data'));
+        } else {
+          // The futures have completed successfully, and the chart data is available in snapshot.data.
+          final List<BarChartGroupData> barGroups = snapshot.data ?? [];
+          maxY = getMaxTransactionValue(barGroups);
+          showingBarGroups = barGroups;
+          return AspectRatio(
+            aspectRatio: 1.7,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Expanded(
+                    child: BarChart(
+                      BarChartData(
+                        maxY: maxY,
+                        barTouchData: BarTouchData(
+                          touchTooltipData: BarTouchTooltipData(
+                            tooltipBgColor: Colors.grey,
+                            getTooltipItem: (a, b, c, d) => null,
+                          ),
+                          touchCallback: (FlTouchEvent event, response) {
+                            if (response == null || response.spot == null) {
+                              setState(() {
+                                touchedGroupIndex = -1;
+                                showingBarGroups = List.of(rawBarGroups);
+                              });
+                              return;
+                            }
 
-                      touchedGroupIndex = response.spot!.touchedBarGroupIndex;
+                            touchedGroupIndex =
+                                response.spot!.touchedBarGroupIndex;
 
-                      setState(() {
-                        if (!event.isInterestedForInteractions) {
-                          touchedGroupIndex = -1;
-                          showingBarGroups = List.of(rawBarGroups);
-                          return;
-                        }
-                        showingBarGroups = List.of(rawBarGroups);
-                        if (touchedGroupIndex != -1) {
-                          var sum = 0.0;
-                          final barData =
-                              showingBarGroups[touchedGroupIndex].barRods;
-                          for (final rod in barData) {
-                            sum += rod.toY;
-                          }
-                          var avg = 0.0;
-                          if (barData[0].toY == 0 || barData[1].toY == 0) {
-                            avg = barData[0].toY == 0
-                                ? barData[1].toY
-                                : barData[0].toY;
-                          } else {
-                            avg = sum / barData.length;
-                          }
-                          final nettColor = barData[0].toY > barData[1].toY
-                              ? Colors.green
-                              : Colors.red;
-                          showingBarGroups[touchedGroupIndex] =
-                              showingBarGroups[touchedGroupIndex].copyWith(
-                            barRods: barData.map((rod) {
-                              return rod.copyWith(toY: avg, color: nettColor);
-                            }).toList(),
-                          );
-                        }
-                      });
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: bottomTitles,
-                        reservedSize: 42,
+                            setState(() {
+                              if (!event.isInterestedForInteractions) {
+                                touchedGroupIndex = -1;
+                                showingBarGroups = List.of(rawBarGroups);
+                                return;
+                              }
+                              showingBarGroups = List.of(rawBarGroups);
+                              if (touchedGroupIndex != -1) {
+                                var sum = 0.0;
+                                final barData =
+                                    showingBarGroups[touchedGroupIndex].barRods;
+                                for (final rod in barData) {
+                                  sum += rod.toY;
+                                }
+                                var avg = 0.0;
+                                if (barData[0].toY == 0 ||
+                                    barData[1].toY == 0) {
+                                  avg = barData[0].toY == 0
+                                      ? barData[1].toY
+                                      : barData[0].toY;
+                                } else {
+                                  avg = sum / barData.length;
+                                }
+                                final nettColor =
+                                    barData[0].toY > barData[1].toY
+                                        ? Colors.green
+                                        : Colors.red;
+                                showingBarGroups[touchedGroupIndex] =
+                                    showingBarGroups[touchedGroupIndex]
+                                        .copyWith(
+                                  barRods: barData.map((rod) {
+                                    return rod.copyWith(
+                                        toY: avg, color: nettColor);
+                                  }).toList(),
+                                );
+                              }
+                            });
+                          },
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: bottomTitles,
+                              reservedSize: 42,
+                            ),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 28,
+                              interval: maxY / 5,
+                              getTitlesWidget: leftTitles,
+                            ),
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          show: false,
+                        ),
+                        barGroups: showingBarGroups,
+                        gridData: FlGridData(
+                          show: true,
+                          horizontalInterval: maxY / 5,
+                          checkToShowVerticalLine: (value) => false,
+                          checkToShowHorizontalLine: (value) => true,
+                          getDrawingHorizontalLine: (value) {
+                            return const FlLine(
+                                strokeWidth: 0.8,
+                                color: Color(0xffe7e8ec),
+                                dashArray: [5, 10]);
+                          },
+                        ),
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 28,
-                        interval: 1,
-                        getTitlesWidget: leftTitles,
-                      ),
-                    ),
                   ),
-                  borderData: FlBorderData(
-                    show: false,
-                  ),
-                  barGroups: showingBarGroups,
-                  gridData: FlGridData(
-                    show: true,
-                    checkToShowVerticalLine: (value) => false,
-                    checkToShowHorizontalLine: (value) => value % 10 == 0,
-                    getDrawingHorizontalLine: (value) {
-                      if (value == 0) {
-                        return const FlLine(
-                          strokeWidth: 10,
-                        );
-                      }
-                      return const FlLine(
-                          strokeWidth: 0.8,
-                          color: Colors.blue,
-                          dashArray: [5, 10]);
-                    },
-                  ),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 
@@ -153,20 +171,10 @@ class PersonalChartState extends State<PersonalChart> {
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    String text;
-    if (value == 0) {
-      text = '1';
-    } else if (value == 10) {
-      text = '5';
-    } else if (value == 19) {
-      text = '10';
-    } else {
-      return Container();
-    }
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 0,
-      child: Text(text, style: style),
+      child: Text(value.toInt().toString(), style: style),
     );
   }
 
@@ -190,12 +198,6 @@ class PersonalChartState extends State<PersonalChart> {
   }
 
   BarChartGroupData makeGroupData(int x, double y1, double y2) {
-    if (y1 > maxY) {
-      y1 = maxY;
-    }
-    if (y2 > maxY) {
-      y2 = maxY;
-    }
     return BarChartGroupData(
       barsSpace: 4,
       x: x,
@@ -212,6 +214,15 @@ class PersonalChartState extends State<PersonalChart> {
         ),
       ],
     );
+  }
+
+  Future<List<BarChartGroupData>> _prepareChartData() async {
+    final List<PersonalModel> transactionData = widget.transactionData;
+    final List<BarChartGroupData> barGroups =
+        convertTransactionToChartData(transactionData);
+    await Future.delayed(
+        Duration(milliseconds: 500)); // Simulating async operations.
+    return barGroups;
   }
 
   convertTransactionToChartData(List<PersonalModel> transactionData) {
@@ -249,6 +260,7 @@ class PersonalChartState extends State<PersonalChart> {
     int startIndex = sortedEntries.length > 7
         ? sortedEntries.length - 7
         : sortedEntries.length - 1;
+
     // Create BarChartGroupData from the grouped data
     for (int i = startIndex; i >= 0; i--) {
       final amounts = sortedEntries[i].value;
@@ -268,6 +280,20 @@ class PersonalChartState extends State<PersonalChart> {
     while (barGroups.length < 7) {
       barGroups.insert(0, makeGroupData(6 - barGroups.length, 0, 0));
     }
+
     return barGroups;
+  }
+
+  double getMaxTransactionValue(List<BarChartGroupData> barGroups) {
+    double max = 0;
+    for (final barGroup in barGroups) {
+      final barData = barGroup.barRods;
+      for (final rod in barData) {
+        if (rod.toY > max) {
+          max = rod.toY;
+        }
+      }
+    }
+    return max;
   }
 }
