@@ -6,7 +6,9 @@ import 'package:finance_tracker/models/personal_model.dart';
 import 'package:flutter/material.dart';
 
 class AddTransaction extends StatefulWidget {
-  const AddTransaction({Key? key}) : super(key: key);
+  final Function(PersonalModel) onNewTransactionAdded;
+  const AddTransaction({Key? key, required this.onNewTransactionAdded})
+      : super(key: key);
 
   @override
   AddTransactionState createState() => AddTransactionState();
@@ -59,8 +61,10 @@ class AddTransactionState extends State<AddTransaction> {
             ElevatedButton(
               onPressed: () {
                 try {
-                  _saveTransaction();
-                  Navigator.pop(context);
+                  final result = _saveTransaction();
+                  if (result) {
+                    Navigator.pop(context);
+                  }
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -138,14 +142,14 @@ class AddTransactionState extends State<AddTransaction> {
     );
   }
 
-  void _saveTransaction() {
+  bool _saveTransaction() {
     if (selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a category'),
         ),
       );
-      return;
+      return false;
     }
     String amountText = _amountController.text;
     String description = _descriptionController.text;
@@ -155,7 +159,7 @@ class AddTransactionState extends State<AddTransaction> {
           content: Text('Please fill in all fields'),
         ),
       );
-      return;
+      return false;
     }
     double amount;
     try {
@@ -170,7 +174,7 @@ class AddTransactionState extends State<AddTransaction> {
           content: Text('Invalid amount'),
         ),
       );
-      return;
+      return false;
     }
     ActivityModel newActivity = ActivityModel(
       title: description,
@@ -193,6 +197,8 @@ class AddTransactionState extends State<AddTransaction> {
         ),
       );
     }
+    widget.onNewTransactionAdded(newPersonal);
+    return true;
   }
 }
 

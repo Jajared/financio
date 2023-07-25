@@ -71,7 +71,9 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       });
       double total = 0;
       categoryMap.forEach((key, value) {
-        total += value.toDouble();
+        if (value < 0) {
+          total += value.toDouble();
+        }
       });
       categoryMap.forEach((key, value) {
         // Add only expenses (income will be handled later)

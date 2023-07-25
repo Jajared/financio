@@ -51,6 +51,12 @@ class _PersonalState extends State<Personal> {
     }
   }
 
+  void _onNewTransactionAdded(PersonalModel newTransaction) {
+    setState(() {
+      transactionData.add(newTransaction);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,7 +75,9 @@ class _PersonalState extends State<Personal> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 200, child: PersonalChart()),
+            SizedBox(
+                height: 200,
+                child: PersonalChart(transactionData: transactionData)),
             SizedBox(
                 height: 250,
                 child: PersonalCategoryChart(transactionData: transactionData)),
@@ -78,7 +86,7 @@ class _PersonalState extends State<Personal> {
               child: Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Text(
-                  "Positions",
+                  "Transactions",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -110,7 +118,8 @@ class _PersonalState extends State<Personal> {
             // Navigate to the page where you want to add a new transaction
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const AddTransaction(),
+                builder: (context) => AddTransaction(
+                    onNewTransactionAdded: _onNewTransactionAdded),
               ),
             );
           },
