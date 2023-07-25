@@ -125,14 +125,17 @@ class PersonalChartState extends State<PersonalChart> {
                   gridData: FlGridData(
                     show: true,
                     checkToShowVerticalLine: (value) => false,
-                    checkToShowHorizontalLine: (value) => value % 5 == 0,
+                    checkToShowHorizontalLine: (value) => value % 10 == 0,
                     getDrawingHorizontalLine: (value) {
                       if (value == 0) {
                         return const FlLine(
                           strokeWidth: 10,
                         );
                       }
-                      return const FlLine(strokeWidth: 0.8, dashArray: [5, 10]);
+                      return const FlLine(
+                          strokeWidth: 0.8,
+                          color: Colors.blue,
+                          dashArray: [5, 10]);
                     },
                   ),
                 ),
@@ -233,7 +236,7 @@ class PersonalChartState extends State<PersonalChart> {
       final date = transaction.timestamp
           .toDate()
           .toString()
-          .split(' ')[0]; // Extract date in 'yyyy-MM-dd' format
+          .split(' ')[0]; // Ext32ract date in 'yyyy-MM-dd' format
       if (groupedData.containsKey(date)) {
         groupedData[date]!.add(transaction.amount);
       } else {
@@ -259,7 +262,7 @@ class PersonalChartState extends State<PersonalChart> {
         }
       }
       final barGroup =
-          makeGroupData(6 + i - startIndex, -expenseAmount, incomeAmount);
+          makeGroupData(6 + i - startIndex, incomeAmount, -expenseAmount);
       barGroups.insert(0, barGroup);
     }
     while (barGroups.length < 7) {

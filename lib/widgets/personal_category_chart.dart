@@ -15,36 +15,50 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
   int touchedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: PieChart(
-          PieChartData(
-            pieTouchData: PieTouchData(
-              touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                setState(() {
-                  if (!event.isInterestedForInteractions ||
-                      pieTouchResponse == null ||
-                      pieTouchResponse.touchedSection == null) {
-                    touchedIndex = -1;
-                    return;
-                  }
-                  touchedIndex =
-                      pieTouchResponse.touchedSection!.touchedSectionIndex;
-                });
-              },
-            ),
-            borderData: FlBorderData(
-              show: false,
-            ),
-            sectionsSpace: 0,
-            centerSpaceRadius: 0,
-            sections: showingSections(),
+    if (widget.transactionData.isEmpty) {
+      // If transactionData is empty, show a default "No Chart Data" pie chart section
+      return const Center(
+        child: Text(
+          'No Chart Data',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return AspectRatio(
+        aspectRatio: 1,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: PieChart(
+            PieChartData(
+              pieTouchData: PieTouchData(
+                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                  setState(() {
+                    if (!event.isInterestedForInteractions ||
+                        pieTouchResponse == null ||
+                        pieTouchResponse.touchedSection == null) {
+                      touchedIndex = -1;
+                      return;
+                    }
+                    touchedIndex =
+                        pieTouchResponse.touchedSection!.touchedSectionIndex;
+                  });
+                },
+              ),
+              borderData: FlBorderData(
+                show: false,
+              ),
+              sectionsSpace: 0,
+              centerSpaceRadius: 0,
+              sections: showingSections(),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   List<PieChartSectionData> showingSections() {
@@ -84,7 +98,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
             title: value.toString(),
             radius: 100,
             titleStyle: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Color.fromRGBO(255, 255, 255, 0.96),
             ),
@@ -93,7 +107,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
               size: 40,
               borderColor: Colors.black,
             ),
-            badgePositionPercentageOffset: .98,
+            badgePositionPercentageOffset: 1,
           ));
         }
       });
