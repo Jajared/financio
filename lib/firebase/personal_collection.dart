@@ -29,4 +29,13 @@ class PersonalCollection extends GetxController {
         .toList();
     return activityData;
   }
+
+  Future<void> deletePersonal(PersonalModel event) async {
+    final newPersonalData = {
+      'events': FieldValue.arrayRemove([event.toJson()])
+    };
+    return activityRef
+        .doc("test")
+        .set(newPersonalData, SetOptions(merge: true));
+  }
 }

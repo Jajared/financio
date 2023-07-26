@@ -186,6 +186,17 @@ class _PersonalState extends State<Personal> {
               amount: personalItem.amount,
               description: personalItem.description,
               timestamp: personalItem.timestamp,
+              onDelete: (deletedItem) {
+                setState(() {
+                  transactionData.removeWhere((item) =>
+                      item.amount == deletedItem.amount &&
+                      item.category == deletedItem.category &&
+                      item.description == deletedItem.description &&
+                      item.timestamp.toDate() ==
+                          deletedItem.timestamp.toDate());
+                  PersonalCollection.instance.deletePersonal(deletedItem);
+                });
+              },
             );
           },
         ),

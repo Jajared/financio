@@ -1,73 +1,94 @@
+import 'package:finance_tracker/models/personal_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PersonalCard extends StatelessWidget {
-  const PersonalCard(
-      {Key? key,
-      required this.category,
-      required this.amount,
-      required this.description,
-      required this.timestamp})
-      : super(key: key);
+  const PersonalCard({
+    Key? key,
+    required this.category,
+    required this.amount,
+    required this.description,
+    required this.timestamp,
+    required this.onDelete,
+  }) : super(key: key);
 
   final String category;
   final double amount;
   final String description;
   final Timestamp timestamp;
+  final Function(PersonalModel) onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Card(
-        color: const Color.fromRGBO(27, 27, 27, 1),
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildIcon(category),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        category,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(255, 255, 255, 0.96),
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        onDelete(PersonalModel(
+          category: category,
+          amount: amount,
+          description: description,
+          timestamp: timestamp,
+        ));
+      },
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      child: GestureDetector(
+        onTap: () {},
+        child: Card(
+          color: const Color.fromRGBO(27, 27, 27, 1),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildIcon(category),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          category,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(255, 255, 255, 0.96),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color.fromRGBO(255, 255, 255, 0.67),
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color.fromRGBO(255, 255, 255, 0.67),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Text(
-                amount < 0
-                    ? "-\$${(-amount).toStringAsFixed(2)}"
-                    : "\$${amount.toStringAsFixed(2)}",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: amount < 0 ? Colors.red : Colors.green,
+                Text(
+                  amount < 0
+                      ? "-\$${(-amount).toStringAsFixed(2)}"
+                      : "\$${amount.toStringAsFixed(2)}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: amount < 0 ? Colors.red : Colors.green,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
