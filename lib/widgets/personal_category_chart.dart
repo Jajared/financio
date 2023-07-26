@@ -15,36 +15,50 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
   int touchedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: PieChart(
-          PieChartData(
-            pieTouchData: PieTouchData(
-              touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                setState(() {
-                  if (!event.isInterestedForInteractions ||
-                      pieTouchResponse == null ||
-                      pieTouchResponse.touchedSection == null) {
-                    touchedIndex = -1;
-                    return;
-                  }
-                  touchedIndex =
-                      pieTouchResponse.touchedSection!.touchedSectionIndex;
-                });
-              },
-            ),
-            borderData: FlBorderData(
-              show: false,
-            ),
-            sectionsSpace: 0,
-            centerSpaceRadius: 0,
-            sections: showingSections(),
+    if (widget.transactionData.isEmpty) {
+      // If transactionData is empty, show a default "No Chart Data" pie chart section
+      return const Center(
+        child: Text(
+          'No Chart Data',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return AspectRatio(
+        aspectRatio: 1,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: PieChart(
+            PieChartData(
+              pieTouchData: PieTouchData(
+                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                  setState(() {
+                    if (!event.isInterestedForInteractions ||
+                        pieTouchResponse == null ||
+                        pieTouchResponse.touchedSection == null) {
+                      touchedIndex = -1;
+                      return;
+                    }
+                    touchedIndex =
+                        pieTouchResponse.touchedSection!.touchedSectionIndex;
+                  });
+                },
+              ),
+              borderData: FlBorderData(
+                show: false,
+              ),
+              sectionsSpace: 0,
+              centerSpaceRadius: 0,
+              sections: showingSections(),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   List<PieChartSectionData> showingSections() {
@@ -71,7 +85,9 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       });
       double total = 0;
       categoryMap.forEach((key, value) {
-        total += value.toDouble();
+        if (value < 0) {
+          total += value.toDouble();
+        }
       });
       categoryMap.forEach((key, value) {
         // Add only expenses (income will be handled later)
@@ -82,7 +98,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
             title: value.toString(),
             radius: 100,
             titleStyle: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Color.fromRGBO(255, 255, 255, 0.96),
             ),
@@ -91,7 +107,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
               size: 40,
               borderColor: Colors.black,
             ),
-            badgePositionPercentageOffset: .98,
+            badgePositionPercentageOffset: 1,
           ));
         }
       });
@@ -103,7 +119,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
 
     return List.generate(sections.length, (i) {
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 20.0 : 16.0;
+      final fontSize = isTouched ? 18.0 : 16.0;
       final radius = isTouched ? 110.0 : 100.0;
       // final widgetSize = isTouched ? 55.0 : 40.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
@@ -111,8 +127,7 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       return PieChartSectionData(
         color: sections[i].color,
         value: sections[i].value,
-        title:
-            '${sections[i].value.toStringAsFixed(2)}%', // Use the value from sections
+        title: '${sections[i].value.toStringAsFixed(2)}%',
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,
@@ -120,10 +135,10 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
           color: const Color(0xffffffff),
           shadows: shadows,
         ),
-        badgeWidget:
-            sections[i].badgeWidget, // Use the badgeWidget from sections
-        badgePositionPercentageOffset: sections[i]
-            .badgePositionPercentageOffset, // Use the badgePositionPercentageOffset from sections
+        badgeWidget: sections[i].badgeWidget,
+        badgePositionPercentageOffset:
+            sections[i].badgePositionPercentageOffset,
+        titlePositionPercentageOffset: 0.55,
       );
     });
   }

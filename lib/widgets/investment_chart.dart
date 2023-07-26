@@ -27,10 +27,9 @@ class InvestmentChartState extends State<InvestmentChart> {
           aspectRatio: 1.70,
           child: Padding(
             padding: const EdgeInsets.only(
-              right: 18,
-              left: 12,
+              right: 20,
+              left: 10,
               top: 24,
-              bottom: 12,
             ),
             child: LineChart(
               showAvg ? avgData() : mainData(),

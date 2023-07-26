@@ -1,3 +1,5 @@
+import 'package:finance_tracker/screens/watchlist.dart';
+import 'package:finance_tracker/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/screens/add_investment.dart';
 import 'package:finance_tracker/widgets/investment_chart.dart';
@@ -107,6 +109,30 @@ class _InvestmentsState extends State<Investments> {
               profit: profit,
             ),
             SizedBox(height: 250, child: InvestmentChart(graphData: graphData)),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  CustomButton(
+                    icon: Icons.bar_chart,
+                    title: "Statistics",
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 10),
+                  CustomButton(
+                    icon: Icons.list,
+                    title: "Watchlist",
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => StockWatchList(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(

@@ -21,7 +21,14 @@ class _InvestmentSummaryState extends State<InvestmentSummary> {
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(227, 162, 44, 169),
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromRGBO(198, 81, 205, 1),
+            Color.fromRGBO(135, 57, 249, 1),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
@@ -65,8 +72,10 @@ class _InvestmentSummaryState extends State<InvestmentSummary> {
             children: [
               Icon(
                 widget.profit >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
-                color: widget.profit >= 0 ? Colors.green : Colors.red,
-                size: 16,
+                color: widget.profit >= 0
+                    ? const Color.fromARGB(255, 24, 217, 30)
+                    : const Color.fromARGB(255, 243, 101, 91),
+                size: 20,
               ),
               const SizedBox(width: 4),
               Text(
@@ -74,7 +83,9 @@ class _InvestmentSummaryState extends State<InvestmentSummary> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: widget.profit >= 0 ? Colors.green : Colors.red,
+                  color: widget.profit >= 0
+                      ? const Color.fromARGB(255, 24, 217, 30)
+                      : const Color.fromARGB(255, 243, 101, 91),
                 ),
               ),
             ],

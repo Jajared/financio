@@ -1,6 +1,7 @@
 import 'package:finance_tracker/firebase/personal_collection.dart';
 import 'package:finance_tracker/models/personal_model.dart';
-import 'package:finance_tracker/widgets/personal_category_chart.dart';
+import 'package:finance_tracker/widgets/custom_button.dart';
+import 'package:finance_tracker/screens/personal_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/screens/add_personal.dart';
 import 'package:intl/intl.dart';
@@ -51,6 +52,12 @@ class _PersonalState extends State<Personal> {
     }
   }
 
+  void _onNewTransactionAdded(PersonalModel newTransaction) {
+    setState(() {
+      transactionData.add(newTransaction);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,16 +76,26 @@ class _PersonalState extends State<Personal> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 200, child: PersonalChart()),
             SizedBox(
-                height: 250,
-                child: PersonalCategoryChart(transactionData: transactionData)),
+                height: 200,
+                child: PersonalChart(transactionData: transactionData)),
+            CustomButton(
+                icon: Icons.pie_chart,
+                title: "Statistics",
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PersonalStatistics(transactionData: transactionData),
+                    ),
+                  );
+                }),
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.only(left: 10),
+                padding: EdgeInsets.only(left: 10, top: 10),
                 child: Text(
-                  "Positions",
+                  "Transactions",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -110,7 +127,8 @@ class _PersonalState extends State<Personal> {
             // Navigate to the page where you want to add a new transaction
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const AddTransaction(),
+                builder: (context) => AddTransaction(
+                    onNewTransactionAdded: _onNewTransactionAdded),
               ),
             );
           },
