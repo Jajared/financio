@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InvestmentModel {
+  final String ticker;
+  final int quantity;
+  final double sharePrice;
+  final Timestamp timestamp;
+
   InvestmentModel({
     required this.ticker,
     required this.quantity,
@@ -8,23 +13,21 @@ class InvestmentModel {
     required this.timestamp,
   });
 
-  final String ticker;
-  final int quantity;
-  final double sharePrice;
-  final Timestamp timestamp;
+  factory InvestmentModel.fromJson(Map<String, dynamic> json) {
+    return InvestmentModel(
+      ticker: json["ticker"],
+      quantity: json["quantity"],
+      sharePrice: json["sharePrice"].toDouble(),
+      timestamp: json["createdAt"],
+    );
+  }
 
-  factory InvestmentModel.fromJson(Map<String, dynamic> json) =>
-      InvestmentModel(
-        ticker: json["ticker"],
-        quantity: json["quantity"],
-        sharePrice: json["sharePrice"].toDouble(),
-        timestamp: json["createdAt"],
-      );
-
-  toJson() => {
-        "ticker": ticker,
-        "quantity": quantity,
-        "sharePrice": sharePrice,
-        "createdAt": timestamp,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      "ticker": ticker,
+      "quantity": quantity,
+      "sharePrice": sharePrice,
+      "createdAt": timestamp,
+    };
+  }
 }

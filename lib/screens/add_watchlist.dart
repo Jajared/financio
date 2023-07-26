@@ -1,24 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finance_tracker/firebase/activity_collection.dart';
 import 'package:finance_tracker/firebase/investment_collection.dart';
-import 'package:finance_tracker/models/investment_model.dart';
-import 'package:finance_tracker/models/activity_model.dart';
+import 'package:finance_tracker/models/watchlist_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
-class AddInvestment extends StatefulWidget {
-  final Function(InvestmentModel) addInvestment;
-  const AddInvestment({Key? key, required this.addInvestment})
+class AddWatchlist extends StatefulWidget {
+  final Function(WatchListModel) onAddToWatchlist;
+  const AddWatchlist({Key? key, required this.onAddToWatchlist})
       : super(key: key);
 
   @override
-  AddInvestmentState createState() => AddInvestmentState();
+  AddWatchlistState createState() => AddWatchlistState();
 }
 
-class AddInvestmentState extends State<AddInvestment> {
+class AddWatchlistState extends State<AddWatchlist> {
   final TextEditingController _tickerController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   List<String> allTickerSymbols = [];
   List<String> searchResults = [];
 
@@ -34,7 +30,7 @@ class AddInvestmentState extends State<AddInvestment> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const Text('Add Investment',
+        title: const Text('Add To Watchlist',
             style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.96))),
         iconTheme:
             const IconThemeData(color: Color.fromRGBO(255, 255, 255, 0.96)),
@@ -47,16 +43,13 @@ class AddInvestmentState extends State<AddInvestment> {
           children: [
             _tickerBox('Ticker', 'Enter ticker'),
             const SizedBox(height: 16),
-            _inputBox('Quantity', 'Enter amount',
-                keyboardType: TextInputType.number),
-            const SizedBox(height: 16),
-            _inputBox('Share Price', 'Enter price',
+            _inputBox('Description', 'Enter description',
                 keyboardType: TextInputType.number),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 try {
-                  _saveInvestment();
+                  _saveToWatchlist();
                   Navigator.pop(context);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +67,7 @@ class AddInvestmentState extends State<AddInvestment> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Save Investment'),
+              child: const Text('Save to watchlist'),
             ),
           ],
         ),
@@ -83,9 +76,9 @@ class AddInvestmentState extends State<AddInvestment> {
   }
 
   Widget _inputBox(String label, String hint,
-      {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
+      {TextInputType keyboardType = TextInputType.text, int maxLines = 3}) {
     return TextField(
-      controller: label == 'Quantity' ? _quantityController : _priceController,
+      controller: _descriptionController,
       keyboardType: keyboardType,
       maxLines: maxLines,
       style: const TextStyle(color: Colors.white),
@@ -155,11 +148,10 @@ class AddInvestmentState extends State<AddInvestment> {
     );
   }
 
-  void _saveInvestment() {
+  void _saveToWatchlist() {
     String ticker = _tickerController.text;
-    String quantityText = _quantityController.text;
-    String priceText = _priceController.text;
-    if (ticker.isEmpty || quantityText.isEmpty || priceText.isEmpty) {
+    String descriptionText = _descriptionController.text;
+    if (ticker.isEmpty || descriptionText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
@@ -167,34 +159,12 @@ class AddInvestmentState extends State<AddInvestment> {
       );
       return;
     }
-    int quantity;
-    double price;
-    try {
-      quantity = int.parse(quantityText);
-      price = double.parse(priceText);
-    } catch (e) {
-      // Handle case when the amount cannot be parsed to double
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid amount'),
-        ),
-      );
-      return;
-    }
-    InvestmentModel newInvestment = InvestmentModel(
+    WatchListModel newWatchlistItem = WatchListModel(
       ticker: ticker,
-      quantity: quantity,
-      sharePrice: price,
-      timestamp: Timestamp.fromDate(DateTime.now()),
-    );
-    ActivityModel newActivity = ActivityModel(
-      title: 'Bought $quantity shares of $ticker',
-      type: 'Investment',
-      timestamp: Timestamp.fromDate(DateTime.now()),
+      description: descriptionText,
     );
     try {
-      ActivityCollection.instance.addActivity(newActivity);
-      InvestmentCollection.instance.addInvestment(newInvestment);
+      InvestmentCollection.instance.addToWatchList(newWatchlistItem);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -202,7 +172,7 @@ class AddInvestmentState extends State<AddInvestment> {
         ),
       );
     }
-    widget.addInvestment(newInvestment);
+    widget.onAddToWatchlist(newWatchlistItem);
   }
 
   Future<void> loadTickerSymbols() async {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_tracker/models/investment_model.dart';
+import 'package:finance_tracker/models/watchlist_model.dart';
 import 'package:get/get.dart';
 
 class InvestmentCollection extends GetxController {
@@ -83,52 +84,61 @@ class InvestmentCollection extends GetxController {
         .set(newInvestmentData, SetOptions(merge: true));
   }
 
-  Future<void> sellInvestment(InvestmentModel event) async {
+  Future<List<InvestmentModel>> sellInvestment(InvestmentModel event) async {
     DocumentSnapshot snapshot = await investmentRef.doc("test").get();
     Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
-    List<dynamic> currentGraphData = currentData['summary']['graphData'];
-    double eventValue = event.sharePrice * event.quantity;
 
+    double profit = 0;
+    // Convert currentData['holdings'] to List<InvestmentModel>
+    List<dynamic> currentHoldingsData = currentData['holdings'];
+    List<InvestmentModel> currentHoldings = currentHoldingsData
+        .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
+        .toList();
+    List<dynamic> currentHoldingsJson =
+        currentHoldings.map((item) => item.toJson()).toList();
+    List<dynamic> currentGraphData = currentData['summary']['graphData'];
+    double totalValue = currentGraphData.last['value'].toDouble();
     // Check if the event ticker is present in the current holdings
-    bool isTickerPresent = false;
-    List<dynamic> currentHoldings = currentData['holdings'];
     for (int i = 0; i < currentHoldings.length; i++) {
-      if (currentHoldings[i]['ticker'] == event.ticker) {
-        isTickerPresent = true;
-        double currentHoldingsValue = currentHoldings[i]['value'].toDouble();
-        double newHoldingsValue = currentHoldingsValue - eventValue;
-        currentHoldings[i]['value'] = newHoldingsValue;
+      InvestmentModel currentHolding = currentHoldings[i];
+      if (currentHolding.ticker == event.ticker) {
+        int currentQuantity = currentHolding.quantity;
+        int newQuantity = currentQuantity - event.quantity;
+        if (currentQuantity == newQuantity) {
+          currentHoldings.removeAt(i);
+        } else {
+          double currentPrice = currentHolding.sharePrice.toDouble();
+          InvestmentModel updatedHolding = InvestmentModel(
+            ticker: currentHolding.ticker,
+            quantity: newQuantity,
+            sharePrice: currentPrice,
+            timestamp: currentHolding.timestamp,
+          );
+          currentHoldings[i] = updatedHolding;
+          profit = (event.sharePrice - currentPrice) * event.quantity;
+        }
+        totalValue = totalValue - (currentHolding.sharePrice * event.quantity);
         break;
       }
     }
 
-    if (!isTickerPresent) {
-      // Handle the case where the event ticker is not present in the current holdings
-      // (e.g., show an error message or take appropriate action)
-      return;
-    }
-
-    // Calculate new total value
-    double newTotalValue =
-        currentData['summary']['total_value'].toDouble() - eventValue;
-
     // Update graph data with new total value
     Map<String, dynamic> lastEntry = currentGraphData.last;
-    lastEntry['value'] = newTotalValue;
+    lastEntry['value'] = totalValue;
     currentGraphData[currentGraphData.length - 1] = lastEntry;
 
     // Update the new investment data
     Map<String, dynamic> newInvestmentData = {
-      'holdings': currentHoldings,
+      'holdings': currentHoldingsJson,
       'summary': {
-        'profit': 0,
+        'profit': profit,
         'graphData': currentGraphData,
       }
     };
 
-    return investmentRef
-        .doc("test")
-        .set(newInvestmentData, SetOptions(merge: true));
+    investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
+
+    return currentHoldings;
   }
 
   getSummary() async {
@@ -144,5 +154,30 @@ class InvestmentCollection extends GetxController {
         .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
         .toList();
     return activityData;
+  }
+
+  Future<List<WatchListModel>> getAllWatchList() async {
+    final snapshot = await investmentRef.doc("test").get();
+    final result = snapshot.data() as Map<String, dynamic>;
+    List<WatchListModel> watchlistData = result['watchlist']
+        .map<WatchListModel>((item) => WatchListModel.fromJson(item))
+        .toList();
+    return watchlistData;
+  }
+
+  Future<void> addToWatchList(WatchListModel newWatchListItem) async {
+    DocumentSnapshot snapshot = await investmentRef.doc("test").get();
+    Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
+    List<dynamic> currentWatchListData = currentData['watchlist'];
+    List<WatchListModel> currentWatchList = currentWatchListData
+        .map<WatchListModel>((item) => WatchListModel.fromJson(item))
+        .toList();
+    List<dynamic> newWatchListData =
+        currentWatchList.map((item) => item.toJson()).toList();
+    newWatchListData.add(newWatchListItem.toJson());
+    Map<String, dynamic> newInvestmentData = {
+      'watchlist': newWatchListData,
+    };
+    investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
   }
 }

@@ -2,10 +2,17 @@ import 'package:finance_tracker/models/personal_model.dart';
 import 'package:finance_tracker/widgets/personal_category_chart.dart';
 import 'package:flutter/material.dart';
 
-class PersonalStatistics extends StatelessWidget {
+class PersonalStatistics extends StatefulWidget {
   final List<PersonalModel> transactionData;
   const PersonalStatistics({required this.transactionData, Key? key})
       : super(key: key);
+
+  @override
+  _PersonalStatisticsState createState() => _PersonalStatisticsState();
+}
+
+class _PersonalStatisticsState extends State<PersonalStatistics> {
+  String _statisticsType = 'Income'; // Flag to track which chart to show
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +29,55 @@ class PersonalStatistics extends StatelessWidget {
         ),
       ),
       backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
-      body: SizedBox(
-          child: PersonalCategoryChart(transactionData: transactionData)),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 48,
+            child: Center(
+              // Center the ToggleButtons horizontally
+              child: ToggleButtons(
+                borderRadius: BorderRadius.circular(8),
+                borderColor: Colors.white,
+                selectedBorderColor: Colors.white,
+                color: Colors.white,
+                selectedColor: Colors.black,
+                fillColor: Colors.white,
+                isSelected: [
+                  _statisticsType == "Income",
+                  _statisticsType == "Expenses"
+                ],
+                onPressed: (index) {
+                  setState(() {
+                    _statisticsType = index == 0 ? "Income" : "Expenses";
+                  });
+                },
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: Text('Income'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: Text('Expenses'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: _statisticsType == 'Income'
+                ? PersonalCategoryChart(
+                    transactionData: widget.transactionData,
+                    type: 'Income',
+                  )
+                : PersonalCategoryChart(
+                    transactionData: widget.transactionData,
+                    type: 'Expenses',
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

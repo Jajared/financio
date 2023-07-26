@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 
 class PersonalCategoryChart extends StatefulWidget {
   final List<PersonalModel> transactionData;
-  const PersonalCategoryChart({required this.transactionData, Key? key})
+  final String type;
+  const PersonalCategoryChart(
+      {required this.transactionData, required this.type, Key? key})
       : super(key: key);
 
   @override
@@ -73,6 +75,10 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
         'Health': Colors.pink,
         'Education': Colors.green,
         'Other': Colors.grey,
+        'Salary': Colors.green,
+        'Investment': Colors.blue,
+        'Gift': Colors.green,
+        'Other Income': Colors.grey,
       };
       Map<String, double> categoryMap = {};
       transactionData.forEach((element) {
@@ -85,13 +91,12 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       });
       double total = 0;
       categoryMap.forEach((key, value) {
-        if (value < 0) {
+        if (widget.type == "Income" ? value < 0 : value > 0) {
           total += value.toDouble();
         }
       });
       categoryMap.forEach((key, value) {
-        // Add only expenses (income will be handled later)
-        if (value < 0) {
+        if (widget.type == "Income" ? value < 0 : value > 0) {
           sections.add(PieChartSectionData(
             color: sectionColors[key],
             value: value / total * 100,
@@ -196,6 +201,14 @@ class _Badge extends StatelessWidget {
       case 'Education':
         return const Icon(Icons.school, size: 26, color: Colors.green);
       case 'Other':
+        return const Icon(Icons.category, size: 26, color: Colors.grey);
+      case 'Salary':
+        return const Icon(Icons.money, size: 26, color: Colors.green);
+      case 'Investment':
+        return const Icon(Icons.attach_money, size: 26, color: Colors.blue);
+      case 'Gift':
+        return const Icon(Icons.card_giftcard, size: 26, color: Colors.green);
+      case 'Other Income':
         return const Icon(Icons.category, size: 26, color: Colors.grey);
       default:
         return const Icon(Icons.category, size: 26, color: Colors.grey);
