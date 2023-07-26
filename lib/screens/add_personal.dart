@@ -31,8 +31,10 @@ class AddTransactionState extends State<AddTransaction> {
   ];
 
   final List<CategoryItem> incomeCategories = [
-    CategoryItem('Income 1', Icons.attach_money, Colors.green),
-    CategoryItem('Income 2', Icons.attach_money, Colors.green),
+    CategoryItem('Salary', Icons.money, Colors.green),
+    CategoryItem('Investment', Icons.trending_up, Colors.blue),
+    CategoryItem('Gift', Icons.card_giftcard, Colors.orange),
+    CategoryItem('Other income', Icons.category, Colors.grey),
   ];
 
   @override

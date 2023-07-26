@@ -92,6 +92,12 @@ class PersonalCard extends StatelessWidget {
         return const Icon(Icons.school, size: 26, color: Colors.green);
       case 'Other':
         return const Icon(Icons.category, size: 26, color: Colors.grey);
+      case 'Salary':
+        return const Icon(Icons.money, size: 26, color: Colors.green);
+      case 'Investment':
+        return const Icon(Icons.trending_up, size: 26, color: Colors.blue);
+      case 'Gift':
+        return const Icon(Icons.card_giftcard, size: 26, color: Colors.orange);
       default:
         return const Icon(Icons.category, size: 26, color: Colors.grey);
     }

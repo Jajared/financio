@@ -46,6 +46,7 @@ class PersonalChartState extends State<PersonalChart> {
           final List<BarChartGroupData> barGroups = snapshot.data ?? [];
           maxY = getMaxTransactionValue(barGroups);
           showingBarGroups = barGroups;
+          rawBarGroups = showingBarGroups;
           return AspectRatio(
             aspectRatio: 1.7,
             child: Padding(
@@ -221,7 +222,7 @@ class PersonalChartState extends State<PersonalChart> {
     final List<BarChartGroupData> barGroups =
         convertTransactionToChartData(transactionData);
     await Future.delayed(
-        Duration(milliseconds: 500)); // Simulating async operations.
+        const Duration(milliseconds: 500)); // Simulating async operations.
     return barGroups;
   }
 

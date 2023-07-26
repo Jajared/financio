@@ -14,23 +14,15 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Gradient colorGradient = const LinearGradient(
-      colors: [
-        Color.fromRGBO(198, 81, 205, 1),
-        Color.fromRGBO(135, 57, 249, 1),
-      ],
-    );
-
     return Container(
       height: 35,
       decoration: BoxDecoration(
-        gradient: colorGradient,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color.fromRGBO(40, 40, 40, 1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -41,14 +33,14 @@ class CustomButton extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 26,
-              color: Colors.white, // Change the icon color as needed
+              size: 24,
+              color: const Color.fromRGBO(198, 81, 205, 1),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(width: 4),
             Text(
               title,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Colors.white, // Change the text color as needed
               ),
             ),

@@ -93,7 +93,7 @@ class _PersonalState extends State<Personal> {
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.only(left: 10),
+                padding: EdgeInsets.only(left: 10, top: 10),
                 child: Text(
                   "Transactions",
                   style: TextStyle(
