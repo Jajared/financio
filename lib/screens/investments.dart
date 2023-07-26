@@ -86,6 +86,20 @@ class _InvestmentsState extends State<Investments> {
     }
   }
 
+  void _onNewInvestmentAdded(InvestmentModel newTransaction) {
+    setState(() {
+      investmentData.add(newTransaction);
+    });
+    _getSummaryData();
+  }
+
+  void _onSellInvestment(List<InvestmentModel> updatedInvestments) {
+    setState(() {
+      investmentData = updatedInvestments;
+    });
+    _getSummaryData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,6 +172,7 @@ class _InvestmentsState extends State<Investments> {
                     tickerSymbol: investmentData[index].ticker,
                     sharePrice: investmentData[index].sharePrice,
                     quantity: investmentData[index].quantity,
+                    onSell: _onSellInvestment,
                   );
                 },
               ),
@@ -169,7 +184,8 @@ class _InvestmentsState extends State<Investments> {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const AddInvestment(),
+              builder: (context) =>
+                  AddInvestment(addInvestment: _onNewInvestmentAdded),
             ),
           );
         },

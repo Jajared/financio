@@ -83,34 +83,45 @@ class InvestmentCollection extends GetxController {
         .set(newInvestmentData, SetOptions(merge: true));
   }
 
-  Future<void> sellInvestment(InvestmentModel event) async {
+  Future<List<InvestmentModel>> sellInvestment(InvestmentModel event) async {
     DocumentSnapshot snapshot = await investmentRef.doc("test").get();
     Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
-    List<dynamic> currentGraphData = currentData['summary']['graphData'];
-    double eventValue = event.sharePrice * event.quantity;
 
+    double eventValue = event.sharePrice * event.quantity;
+    double profit = 0;
+    // Convert currentData['holdings'] to List<InvestmentModel>
+    List<dynamic> currentHoldingsData = currentData['holdings'];
+    List<InvestmentModel> currentHoldings = currentHoldingsData
+        .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
+        .toList();
     // Check if the event ticker is present in the current holdings
-    bool isTickerPresent = false;
-    List<dynamic> currentHoldings = currentData['holdings'];
     for (int i = 0; i < currentHoldings.length; i++) {
-      if (currentHoldings[i]['ticker'] == event.ticker) {
-        isTickerPresent = true;
-        double currentHoldingsValue = currentHoldings[i]['value'].toDouble();
-        double newHoldingsValue = currentHoldingsValue - eventValue;
-        currentHoldings[i]['value'] = newHoldingsValue;
+      InvestmentModel currentHolding = currentHoldings[i];
+      if (currentHolding.ticker == event.ticker) {
+        int currentQuantity = currentHolding.quantity;
+        int newQuantity = currentQuantity - event.quantity;
+        if (currentQuantity == newQuantity) {
+          currentHoldings.removeAt(i);
+        } else {
+          double currentPrice = currentHolding.sharePrice.toDouble();
+          InvestmentModel updatedHolding = InvestmentModel(
+            ticker: currentHolding.ticker,
+            quantity: newQuantity,
+            sharePrice: currentPrice,
+            timestamp: currentHolding.timestamp,
+          );
+          currentHoldings[i] = updatedHolding;
+          profit = (event.sharePrice - currentPrice) * event.quantity;
+        }
         break;
       }
     }
-
-    if (!isTickerPresent) {
-      // Handle the case where the event ticker is not present in the current holdings
-      // (e.g., show an error message or take appropriate action)
-      return;
-    }
-
+    List<dynamic> currentHoldingsJson =
+        currentHoldings.map((item) => item.toJson()).toList();
+    List<dynamic> currentGraphData = currentData['summary']['graphData'];
     // Calculate new total value
     double newTotalValue =
-        currentData['summary']['total_value'].toDouble() - eventValue;
+        currentGraphData.last['value'].toDouble() - eventValue;
 
     // Update graph data with new total value
     Map<String, dynamic> lastEntry = currentGraphData.last;
@@ -119,16 +130,16 @@ class InvestmentCollection extends GetxController {
 
     // Update the new investment data
     Map<String, dynamic> newInvestmentData = {
-      'holdings': currentHoldings,
+      'holdings': currentHoldingsJson,
       'summary': {
-        'profit': 0,
+        'profit': profit,
         'graphData': currentGraphData,
       }
     };
 
-    return investmentRef
-        .doc("test")
-        .set(newInvestmentData, SetOptions(merge: true));
+    investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
+
+    return currentHoldings;
   }
 
   getSummary() async {

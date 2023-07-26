@@ -1,27 +1,38 @@
+import 'package:finance_tracker/models/investment_model.dart';
 import 'package:finance_tracker/screens/sell_investment.dart';
 import 'package:flutter/material.dart';
 
-class InvestmentCard extends StatelessWidget {
+class InvestmentCard extends StatefulWidget {
   final String tickerSymbol;
   final double sharePrice;
   final int quantity;
+  final Function(List<InvestmentModel>) onSell;
 
-  const InvestmentCard({
-    Key? key,
-    required this.tickerSymbol,
-    required this.sharePrice,
-    required this.quantity,
-  }) : super(key: key);
+  const InvestmentCard(
+      {Key? key,
+      required this.tickerSymbol,
+      required this.sharePrice,
+      required this.quantity,
+      required this.onSell})
+      : super(key: key);
 
   @override
+  _InvestmentCardState createState() => _InvestmentCardState();
+}
+
+class _InvestmentCardState extends State<InvestmentCard> {
+  @override
   Widget build(BuildContext context) {
-    double totalValue = sharePrice * quantity;
+    double totalValue = widget.sharePrice * widget.quantity;
 
     return GestureDetector(
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => SellInvestment(ticker: tickerSymbol),
+              builder: (context) => SellInvestment(
+                ticker: widget.tickerSymbol,
+                onSell: widget.onSell,
+              ),
             ),
           );
         },
@@ -37,7 +48,7 @@ class InvestmentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tickerSymbol,
+                  widget.tickerSymbol,
                   style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -45,12 +56,12 @@ class InvestmentCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Share Price: \$${sharePrice.toStringAsFixed(2)}',
+                  'Share Price: \$${widget.sharePrice.toStringAsFixed(2)}',
                   style: const TextStyle(
                       fontSize: 14, color: Color.fromRGBO(255, 255, 255, 0.67)),
                 ),
                 Text(
-                  'Quantity: $quantity',
+                  'Quantity: ${widget.quantity}',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Color.fromRGBO(255, 255, 255, 0.67),

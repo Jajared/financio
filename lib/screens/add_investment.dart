@@ -6,7 +6,9 @@ import 'package:finance_tracker/models/activity_model.dart';
 import 'package:flutter/material.dart';
 
 class AddInvestment extends StatefulWidget {
-  const AddInvestment({Key? key}) : super(key: key);
+  final Function(InvestmentModel) addInvestment;
+  const AddInvestment({Key? key, required this.addInvestment})
+      : super(key: key);
 
   @override
   AddInvestmentState createState() => AddInvestmentState();
@@ -141,5 +143,6 @@ class AddInvestmentState extends State<AddInvestment> {
         ),
       );
     }
+    widget.addInvestment(newInvestment);
   }
 }

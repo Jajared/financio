@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 
 class SellInvestment extends StatefulWidget {
   final String ticker;
-  const SellInvestment({Key? key, required this.ticker}) : super(key: key);
+  final Function(List<InvestmentModel>) onSell;
+  const SellInvestment({Key? key, required this.ticker, required this.onSell})
+      : super(key: key);
 
   @override
   SellInvestmentState createState() => SellInvestmentState();
@@ -36,7 +38,17 @@ class SellInvestmentState extends State<SellInvestment> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _inputBox(ticker, 'Enter ticker'),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.grey[800], // You can customize the color here
+              ),
+              child: Text(
+                ticker,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
             const SizedBox(height: 16),
             _inputBox('Quantity', 'Enter amount',
                 keyboardType: TextInputType.number),
@@ -96,11 +108,10 @@ class SellInvestmentState extends State<SellInvestment> {
     );
   }
 
-  void _saveInvestment() {
-    String ticker = _tickerController.text;
+  void _saveInvestment() async {
     String quantityText = _quantityController.text;
     String priceText = _priceController.text;
-    if (ticker.isEmpty || quantityText.isEmpty || priceText.isEmpty) {
+    if (quantityText.isEmpty || priceText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
@@ -123,19 +134,21 @@ class SellInvestmentState extends State<SellInvestment> {
       return;
     }
     InvestmentModel newInvestment = InvestmentModel(
-      ticker: ticker,
+      ticker: widget.ticker,
       quantity: quantity,
       sharePrice: price,
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
     ActivityModel newActivity = ActivityModel(
-      title: 'Bought $quantity shares of $ticker',
+      title: 'Sold $quantity shares of ${widget.ticker}',
       type: 'Investment',
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
     try {
       ActivityCollection.instance.addActivity(newActivity);
-      InvestmentCollection.instance.addInvestment(newInvestment);
+      List<InvestmentModel> updatedInvestments =
+          await InvestmentCollection.instance.sellInvestment(newInvestment);
+      widget.onSell(updatedInvestments);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
