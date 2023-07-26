@@ -4,6 +4,7 @@ import 'package:finance_tracker/firebase/investment_collection.dart';
 import 'package:finance_tracker/models/investment_model.dart';
 import 'package:finance_tracker/models/activity_model.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 class AddInvestment extends StatefulWidget {
   final Function(InvestmentModel) addInvestment;
@@ -18,6 +19,14 @@ class AddInvestmentState extends State<AddInvestment> {
   final TextEditingController _tickerController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  List<String> allTickerSymbols = [];
+  List<String> searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadTickerSymbols();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +45,7 @@ class AddInvestmentState extends State<AddInvestment> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _inputBox('Ticker', 'Enter ticker'),
+            _tickerBox('Ticker', 'Enter ticker'),
             const SizedBox(height: 16),
             _inputBox('Quantity', 'Enter amount',
                 keyboardType: TextInputType.number),
@@ -76,11 +85,7 @@ class AddInvestmentState extends State<AddInvestment> {
   Widget _inputBox(String label, String hint,
       {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
     return TextField(
-      controller: label == 'Ticker'
-          ? _tickerController
-          : label == 'Quantity'
-              ? _quantityController
-              : _priceController,
+      controller: label == 'Quantity' ? _quantityController : _priceController,
       keyboardType: keyboardType,
       maxLines: maxLines,
       style: const TextStyle(color: Colors.white),
@@ -93,6 +98,59 @@ class AddInvestmentState extends State<AddInvestment> {
         contentPadding:
             const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       ),
+    );
+  }
+
+  Widget _tickerBox(String label, String hint,
+      {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: _tickerController,
+          keyboardType: keyboardType,
+          onChanged: searchTickerSymbols,
+          maxLines: maxLines,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hint,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          ),
+        ),
+        if (searchResults.isNotEmpty)
+          Container(
+            height: 200, // Set a fixed height for the search results container
+            decoration: BoxDecoration(
+              color: Colors
+                  .transparent, // Set a transparent color for the container
+              border: Border.all(
+                color: Colors.white, // Add a border for visibility
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListView.builder(
+              itemCount: searchResults.length,
+              itemBuilder: (context, index) {
+                String ticker = searchResults[index];
+                return ListTile(
+                  title:
+                      Text(ticker, style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    setState(() {
+                      _tickerController.text = ticker;
+                      searchResults.clear();
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+      ],
     );
   }
 
@@ -144,5 +202,31 @@ class AddInvestmentState extends State<AddInvestment> {
       );
     }
     widget.addInvestment(newInvestment);
+  }
+
+  Future<void> loadTickerSymbols() async {
+    String jsonData = await DefaultAssetBundle.of(context)
+        .loadString('lib/assets/stock_tickers.json');
+    List<dynamic> data = json.decode(jsonData);
+    List<String> result =
+        data.map((item) => item['Ticker'].toString()).toList();
+    allTickerSymbols = result;
+  }
+
+  void searchTickerSymbols(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        searchResults.clear();
+      });
+      return;
+    }
+
+    List<String> matches = allTickerSymbols
+        .where((ticker) => ticker.startsWith(query.toUpperCase()))
+        .toList();
+
+    setState(() {
+      searchResults = matches;
+    });
   }
 }

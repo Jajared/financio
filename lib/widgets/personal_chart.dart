@@ -144,7 +144,7 @@ class PersonalChartState extends State<PersonalChart> {
                         barGroups: showingBarGroups,
                         gridData: FlGridData(
                           show: true,
-                          horizontalInterval: maxY / 5,
+                          horizontalInterval: maxY / 5, // Fix scaling
                           checkToShowVerticalLine: (value) => false,
                           checkToShowHorizontalLine: (value) => true,
                           getDrawingHorizontalLine: (value) {
@@ -193,7 +193,7 @@ class PersonalChartState extends State<PersonalChart> {
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      space: 16, //margin top
+      space: 16,
       child: text,
     );
   }

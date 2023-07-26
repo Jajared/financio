@@ -87,13 +87,16 @@ class InvestmentCollection extends GetxController {
     DocumentSnapshot snapshot = await investmentRef.doc("test").get();
     Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
 
-    double eventValue = event.sharePrice * event.quantity;
     double profit = 0;
     // Convert currentData['holdings'] to List<InvestmentModel>
     List<dynamic> currentHoldingsData = currentData['holdings'];
     List<InvestmentModel> currentHoldings = currentHoldingsData
         .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
         .toList();
+    List<dynamic> currentHoldingsJson =
+        currentHoldings.map((item) => item.toJson()).toList();
+    List<dynamic> currentGraphData = currentData['summary']['graphData'];
+    double totalValue = currentGraphData.last['value'].toDouble();
     // Check if the event ticker is present in the current holdings
     for (int i = 0; i < currentHoldings.length; i++) {
       InvestmentModel currentHolding = currentHoldings[i];
@@ -113,19 +116,14 @@ class InvestmentCollection extends GetxController {
           currentHoldings[i] = updatedHolding;
           profit = (event.sharePrice - currentPrice) * event.quantity;
         }
+        totalValue = totalValue - (currentHolding.sharePrice * event.quantity);
         break;
       }
     }
-    List<dynamic> currentHoldingsJson =
-        currentHoldings.map((item) => item.toJson()).toList();
-    List<dynamic> currentGraphData = currentData['summary']['graphData'];
-    // Calculate new total value
-    double newTotalValue =
-        currentGraphData.last['value'].toDouble() - eventValue;
 
     // Update graph data with new total value
     Map<String, dynamic> lastEntry = currentGraphData.last;
-    lastEntry['value'] = newTotalValue;
+    lastEntry['value'] = totalValue;
     currentGraphData[currentGraphData.length - 1] = lastEntry;
 
     // Update the new investment data
