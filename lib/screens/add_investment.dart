@@ -123,31 +123,32 @@ class AddInvestmentState extends State<AddInvestment> {
           ),
         ),
         if (searchResults.isNotEmpty)
-          Container(
-            height: 200, // Set a fixed height for the search results container
-            decoration: BoxDecoration(
-              color: Colors
-                  .transparent, // Set a transparent color for the container
-              border: Border.all(
-                color: Colors.white, // Add a border for visibility
+          SizedBox(
+            height: 200,
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(color: Color.fromRGBO(70, 70, 70, 1)),
+                  right: BorderSide(color: Color.fromRGBO(70, 70, 70, 1)),
+                  bottom: BorderSide(color: Color.fromRGBO(70, 70, 70, 1)),
+                ),
               ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: ListView.builder(
-              itemCount: searchResults.length,
-              itemBuilder: (context, index) {
-                String ticker = searchResults[index];
-                return ListTile(
-                  title:
-                      Text(ticker, style: const TextStyle(color: Colors.white)),
-                  onTap: () {
-                    setState(() {
-                      _tickerController.text = ticker;
-                      searchResults.clear();
-                    });
-                  },
-                );
-              },
+              child: ListView.builder(
+                itemCount: searchResults.length,
+                itemBuilder: (context, index) {
+                  String ticker = searchResults[index];
+                  return ListTile(
+                    title: Text(ticker,
+                        style: const TextStyle(color: Colors.white)),
+                    onTap: () {
+                      setState(() {
+                        _tickerController.text = ticker;
+                        searchResults.clear();
+                      });
+                    },
+                  );
+                },
+              ),
             ),
           ),
       ],

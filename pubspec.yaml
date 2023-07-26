@@ -64,6 +64,8 @@ flutter:
   uses-material-design: true
   assets:
     - lib/assets/stock_tickers.json
+    - lib/assets/icons/nasdaq-icon.png
+    - lib/assets/icons/nyse-icon.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
