@@ -1,12 +1,52 @@
+import 'package:finance_tracker/firebase/investment_collection.dart';
+import 'package:finance_tracker/models/watchlist_model.dart';
+import 'package:finance_tracker/screens/add_watchlist.dart';
+import 'package:finance_tracker/widgets/watchlist_card.dart';
 import 'package:flutter/material.dart';
 
-class StockWatchList extends StatelessWidget {
-  final List<StockWatchlistItem> watchlistItems = [
-    StockWatchlistItem(symbol: "AAPL", name: "Apple Inc."),
-    StockWatchlistItem(symbol: "GOOGL", name: "Alphabet Inc."),
-    StockWatchlistItem(symbol: "AMZN", name: "Amazon.com Inc."),
-    // Add more watchlist items here
-  ];
+class StockWatchList extends StatefulWidget {
+  const StockWatchList({Key? key}) : super(key: key);
+
+  @override
+  StockWatchListState createState() => StockWatchListState();
+}
+
+class StockWatchListState extends State<StockWatchList> {
+  List<WatchListModel> allWatchlistItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getWatchlistData();
+  }
+
+  Future<void> _getWatchlistData() async {
+    try {
+      final result = await InvestmentCollection.instance.getAllWatchList();
+      setState(() {
+        allWatchlistItems = result;
+      });
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content:
+                const Text("An error occurred while fetching watchlist data."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,42 +64,31 @@ class StockWatchList extends StatelessWidget {
       ),
       backgroundColor: const Color.fromRGBO(16, 16, 16, 1),
       body: ListView.builder(
-        itemCount: watchlistItems.length,
+        itemCount: allWatchlistItems.length,
         itemBuilder: (context, index) {
-          final item = watchlistItems[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Card(
-              elevation: 2.0, // Add a shadow effect to the cards
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: ListTile(
-                title: Text(
-                  item.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Text(item.symbol),
-                trailing:
-                    const Icon(Icons.arrow_forward_ios), // Add a trailing icon
-                onTap: () {
-                  // Implement the navigation to the detail page here
-                  // For example, you can use Navigator.push to navigate to the detail page.
-                },
-              ),
+          final item = allWatchlistItems[index];
+          return WatchlistItemCard(item: item);
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddWatchlist(onAddToWatchlist: _onAddToWatchlist),
             ),
           );
         },
+        backgroundColor: const Color.fromRGBO(135, 57, 249, 1),
+        mini: true,
+        child: const Icon(Icons.add),
       ),
     );
   }
-}
 
-class StockWatchlistItem {
-  final String symbol;
-  final String name;
-
-  StockWatchlistItem({required this.symbol, required this.name});
+  void _onAddToWatchlist(WatchListModel newWatchlistItem) {
+    setState(() {
+      allWatchlistItems.add(newWatchlistItem);
+    });
+  }
 }

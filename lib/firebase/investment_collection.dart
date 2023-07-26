@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_tracker/models/investment_model.dart';
+import 'package:finance_tracker/models/watchlist_model.dart';
 import 'package:get/get.dart';
 
 class InvestmentCollection extends GetxController {
@@ -153,5 +154,30 @@ class InvestmentCollection extends GetxController {
         .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
         .toList();
     return activityData;
+  }
+
+  Future<List<WatchListModel>> getAllWatchList() async {
+    final snapshot = await investmentRef.doc("test").get();
+    final result = snapshot.data() as Map<String, dynamic>;
+    List<WatchListModel> watchlistData = result['watchlist']
+        .map<WatchListModel>((item) => WatchListModel.fromJson(item))
+        .toList();
+    return watchlistData;
+  }
+
+  Future<void> addToWatchList(WatchListModel newWatchListItem) async {
+    DocumentSnapshot snapshot = await investmentRef.doc("test").get();
+    Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
+    List<dynamic> currentWatchListData = currentData['watchlist'];
+    List<WatchListModel> currentWatchList = currentWatchListData
+        .map<WatchListModel>((item) => WatchListModel.fromJson(item))
+        .toList();
+    List<dynamic> newWatchListData =
+        currentWatchList.map((item) => item.toJson()).toList();
+    newWatchListData.add(newWatchListItem.toJson());
+    Map<String, dynamic> newInvestmentData = {
+      'watchlist': newWatchListData,
+    };
+    investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
   }
 }
