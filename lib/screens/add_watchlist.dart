@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financio/firebase/investment_collection.dart';
 import 'package:financio/models/watchlist_model.dart';
 import 'package:flutter/material.dart';
@@ -161,7 +162,12 @@ class AddWatchlistState extends State<AddWatchlist> {
     }
     WatchListModel newWatchlistItem = WatchListModel(
       ticker: ticker,
-      description: descriptionText,
+      descriptions: [
+        DescriptionModel(
+          timestamp: Timestamp.fromDate(DateTime.now()),
+          description: descriptionText,
+        )
+      ],
     );
     try {
       InvestmentCollection.instance.addToWatchList(newWatchlistItem);

@@ -8,7 +8,8 @@ import 'dart:convert';
 
 class AddInvestment extends StatefulWidget {
   final Function(InvestmentModel) addInvestment;
-  const AddInvestment({Key? key, required this.addInvestment})
+  final String? ticker;
+  const AddInvestment({Key? key, required this.addInvestment, this.ticker})
       : super(key: key);
 
   @override
@@ -45,7 +46,21 @@ class AddInvestmentState extends State<AddInvestment> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _tickerBox('Ticker', 'Enter ticker'),
+            widget.ticker == null
+                ? _tickerBox('Ticker', 'Enter ticker')
+                : Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color:
+                          Colors.grey[800], // You can customize the color here
+                    ),
+                    child: Text(
+                      widget.ticker!,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
             const SizedBox(height: 16),
             _inputBox('Quantity', 'Enter amount',
                 keyboardType: TextInputType.number),
@@ -159,7 +174,9 @@ class AddInvestmentState extends State<AddInvestment> {
     String ticker = _tickerController.text;
     String quantityText = _quantityController.text;
     String priceText = _priceController.text;
-    if (ticker.isEmpty || quantityText.isEmpty || priceText.isEmpty) {
+    if ((ticker.isEmpty && widget.ticker == null) ||
+        quantityText.isEmpty ||
+        priceText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
@@ -182,13 +199,14 @@ class AddInvestmentState extends State<AddInvestment> {
       return;
     }
     InvestmentModel newInvestment = InvestmentModel(
-      ticker: ticker,
+      ticker: widget.ticker != null ? widget.ticker! : ticker,
       quantity: quantity,
       sharePrice: price,
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
     ActivityModel newActivity = ActivityModel(
-      title: 'Bought $quantity shares of $ticker',
+      title:
+          'Bought $quantity shares of ${widget.ticker != null ? widget.ticker! : ticker}',
       type: 'Investment',
       timestamp: Timestamp.fromDate(DateTime.now()),
     );

@@ -139,7 +139,8 @@ class _InvestmentsState extends State<Investments> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const StockWatchList(),
+                          builder: (context) => StockWatchList(
+                              addNewInvestment: _onNewInvestmentAdded),
                         ),
                       );
                     },

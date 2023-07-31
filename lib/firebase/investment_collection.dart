@@ -180,4 +180,20 @@ class InvestmentCollection extends GetxController {
     };
     investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
   }
+
+  Future<void> deleteFromWatchList(WatchListModel watchListItem) async {
+    investmentRef.doc("test").update({
+      'watchlist': FieldValue.arrayRemove([watchListItem.toJson()])
+    });
+  }
+
+  Future<void> updateWatchListItem(WatchListModel prevWatchListItem,
+      WatchListModel updatedWatchListItem) async {
+    investmentRef.doc("test").update({
+      'watchlist': FieldValue.arrayRemove([prevWatchListItem.toJson()])
+    });
+    investmentRef.doc("test").update({
+      'watchlist': FieldValue.arrayUnion([updatedWatchListItem.toJson()])
+    });
+  }
 }

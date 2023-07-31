@@ -1,11 +1,14 @@
 import 'package:financio/firebase/investment_collection.dart';
+import 'package:financio/models/investment_model.dart';
 import 'package:financio/models/watchlist_model.dart';
 import 'package:financio/screens/add_watchlist.dart';
 import 'package:financio/widgets/watchlist_card.dart';
 import 'package:flutter/material.dart';
 
 class StockWatchList extends StatefulWidget {
-  const StockWatchList({Key? key}) : super(key: key);
+  final Function(InvestmentModel) addNewInvestment;
+  const StockWatchList({Key? key, required this.addNewInvestment})
+      : super(key: key);
 
   @override
   StockWatchListState createState() => StockWatchListState();
@@ -67,7 +70,10 @@ class StockWatchListState extends State<StockWatchList> {
         itemCount: allWatchlistItems.length,
         itemBuilder: (context, index) {
           final item = allWatchlistItems[index];
-          return WatchlistItemCard(item: item);
+          return WatchlistItemCard(
+              onDelete: _onDelete,
+              addNewInvestment: widget.addNewInvestment,
+              item: item);
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -89,6 +95,12 @@ class StockWatchListState extends State<StockWatchList> {
   void _onAddToWatchlist(WatchListModel newWatchlistItem) {
     setState(() {
       allWatchlistItems.add(newWatchlistItem);
+    });
+  }
+
+  void _onDelete(WatchListModel watchlist) {
+    setState(() {
+      allWatchlistItems.remove(watchlist);
     });
   }
 }

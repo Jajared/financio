@@ -80,11 +80,13 @@ class _InvestmentCardState extends State<InvestmentCard> {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Image.asset(
-                          logoUrl,
-                          width: 24,
-                          height: 24,
-                        ),
+                        logoUrl != ""
+                            ? Image.asset(
+                                logoUrl,
+                                width: 24,
+                                height: 24,
+                              )
+                            : const SizedBox(width: 24, height: 24),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
@@ -97,6 +99,8 @@ class _InvestmentCardState extends State<InvestmentCard> {
                                   color: Color.fromRGBO(255, 255, 255, 1),
                                   fontWeight: FontWeight.w600,
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -121,7 +125,6 @@ class _InvestmentCardState extends State<InvestmentCard> {
                       ],
                     );
                   } else {
-                    // Return a loading indicator or an empty widget while waiting for data
                     return const CircularProgressIndicator();
                   }
                 },
@@ -135,26 +138,34 @@ class _InvestmentCardState extends State<InvestmentCard> {
 
   // Get stock full name from json
   Future<String> getStockFullName(ticker) async {
-    String jsonString = await DefaultAssetBundle.of(context)
-        .loadString('lib/assets/stock_tickers.json');
-    List<dynamic> data = json.decode(jsonString);
-    Map<String, dynamic> stock = data.firstWhere(
-      (stock) => stock['Ticker'] == ticker,
-      orElse: () => null,
-    );
-    return stock['Name'];
+    try {
+      String jsonString = await DefaultAssetBundle.of(context)
+          .loadString('lib/assets/stock_tickers.json');
+      List<dynamic> data = json.decode(jsonString);
+      Map<String, dynamic> stock = data.firstWhere(
+        (stock) => stock['Ticker'] == ticker,
+        orElse: () => null,
+      );
+      return stock['Name'];
+    } catch (e) {
+      return '';
+    }
   }
 
   // Get stock logo from json
   Future<String> getStockLogo(ticker) async {
-    String jsonString = await DefaultAssetBundle.of(context)
-        .loadString('lib/assets/stock_tickers.json');
-    List<dynamic> data = json.decode(jsonString);
-    Map<String, dynamic> stock = data.firstWhere(
-      (stock) => stock['Ticker'] == ticker,
-      orElse: () => null,
-    );
-    final stockExchange = stock['Exchange'];
-    return stockExchange;
+    try {
+      String jsonString = await DefaultAssetBundle.of(context)
+          .loadString('lib/assets/stock_tickers.json');
+      List<dynamic> data = json.decode(jsonString);
+      Map<String, dynamic> stock = data.firstWhere(
+        (stock) => stock['Ticker'] == ticker,
+        orElse: () => null,
+      );
+      final stockExchange = stock['Exchange'];
+      return stockExchange;
+    } catch (e) {
+      return '';
+    }
   }
 }
