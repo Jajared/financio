@@ -1,4 +1,4 @@
-import 'package:finance_tracker/models/watchlist_model.dart';
+import 'package:financio/models/watchlist_model.dart';
 import 'package:flutter/material.dart';
 
 class WatchlistItemCard extends StatelessWidget {

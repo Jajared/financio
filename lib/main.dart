@@ -1,6 +1,6 @@
-import 'package:finance_tracker/screens/investments.dart';
-import 'package:finance_tracker/screens/personal.dart';
-import 'package:finance_tracker/screens/activity.dart';
+import 'package:financio/screens/investments.dart';
+import 'package:financio/screens/personal.dart';
+import 'package:financio/screens/activity.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finance_tracker/models/investment_model.dart';
-import 'package:finance_tracker/models/watchlist_model.dart';
+import 'package:financio/models/investment_model.dart';
+import 'package:financio/models/watchlist_model.dart';
 import 'package:get/get.dart';
 
 class InvestmentCollection extends GetxController {

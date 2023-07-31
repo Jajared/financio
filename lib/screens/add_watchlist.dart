@@ -1,5 +1,5 @@
-import 'package:finance_tracker/firebase/investment_collection.dart';
-import 'package:finance_tracker/models/watchlist_model.dart';
+import 'package:financio/firebase/investment_collection.dart';
+import 'package:financio/models/watchlist_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 

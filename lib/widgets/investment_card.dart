@@ -1,5 +1,5 @@
-import 'package:finance_tracker/models/investment_model.dart';
-import 'package:finance_tracker/screens/sell_investment.dart';
+import 'package:financio/models/investment_model.dart';
+import 'package:financio/screens/sell_investment.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 

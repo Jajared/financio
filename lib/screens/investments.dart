@@ -1,12 +1,12 @@
-import 'package:finance_tracker/screens/watchlist.dart';
-import 'package:finance_tracker/widgets/custom_button.dart';
+import 'package:financio/screens/watchlist.dart';
+import 'package:financio/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_tracker/screens/add_investment.dart';
-import 'package:finance_tracker/widgets/investment_chart.dart';
-import 'package:finance_tracker/firebase/investment_collection.dart';
-import 'package:finance_tracker/models/investment_model.dart';
-import 'package:finance_tracker/widgets/investment_card.dart';
-import 'package:finance_tracker/widgets/investment_summary.dart';
+import 'package:financio/screens/add_investment.dart';
+import 'package:financio/widgets/investment_chart.dart';
+import 'package:financio/firebase/investment_collection.dart';
+import 'package:financio/models/investment_model.dart';
+import 'package:financio/widgets/investment_card.dart';
+import 'package:financio/widgets/investment_summary.dart';
 
 class Investments extends StatefulWidget {
   const Investments({Key? key}) : super(key: key);

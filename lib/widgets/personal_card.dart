@@ -1,4 +1,4 @@
-import 'package:finance_tracker/models/personal_model.dart';
+import 'package:financio/models/personal_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

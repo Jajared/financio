@@ -1,9 +1,9 @@
-import 'package:finance_tracker/firebase/personal_collection.dart';
-import 'package:finance_tracker/models/personal_model.dart';
-import 'package:finance_tracker/widgets/custom_button.dart';
-import 'package:finance_tracker/screens/personal_statistics.dart';
+import 'package:financio/firebase/personal_collection.dart';
+import 'package:financio/models/personal_model.dart';
+import 'package:financio/widgets/custom_button.dart';
+import 'package:financio/screens/personal_statistics.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_tracker/screens/add_personal.dart';
+import 'package:financio/screens/add_personal.dart';
 import 'package:intl/intl.dart';
 import '../widgets/personal_card.dart';
 import '../widgets/personal_chart.dart';

@@ -1,5 +1,5 @@
-import 'package:finance_tracker/models/personal_model.dart';
-import 'package:finance_tracker/widgets/personal_category_chart.dart';
+import 'package:financio/models/personal_model.dart';
+import 'package:financio/widgets/personal_category_chart.dart';
 import 'package:flutter/material.dart';
 
 class PersonalStatistics extends StatefulWidget {

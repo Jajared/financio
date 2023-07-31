@@ -1,7 +1,7 @@
-import 'package:finance_tracker/firebase/investment_collection.dart';
-import 'package:finance_tracker/models/watchlist_model.dart';
-import 'package:finance_tracker/screens/add_watchlist.dart';
-import 'package:finance_tracker/widgets/watchlist_card.dart';
+import 'package:financio/firebase/investment_collection.dart';
+import 'package:financio/models/watchlist_model.dart';
+import 'package:financio/screens/add_watchlist.dart';
+import 'package:financio/widgets/watchlist_card.dart';
 import 'package:flutter/material.dart';
 
 class StockWatchList extends StatefulWidget {

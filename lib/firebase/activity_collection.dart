@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finance_tracker/models/activity_model.dart';
+import 'package:financio/models/activity_model.dart';
 import 'package:get/get.dart';
 
 class ActivityCollection extends GetxController {

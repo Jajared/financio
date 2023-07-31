@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finance_tracker/firebase/activity_collection.dart';
-import 'package:finance_tracker/firebase/personal_collection.dart';
-import 'package:finance_tracker/models/activity_model.dart';
-import 'package:finance_tracker/models/personal_model.dart';
+import 'package:financio/firebase/activity_collection.dart';
+import 'package:financio/firebase/personal_collection.dart';
+import 'package:financio/models/activity_model.dart';
+import 'package:financio/models/personal_model.dart';
 import 'package:flutter/material.dart';
 
 class AddTransaction extends StatefulWidget {
