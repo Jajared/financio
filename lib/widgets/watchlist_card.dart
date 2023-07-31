@@ -33,7 +33,7 @@ class WatchlistItemCard extends StatelessWidget {
           ),
           subtitle: Text(item.descriptions.last.description,
               style: const TextStyle(color: Colors.white)),
-          trailing: const Icon(Icons.arrow_forward_ios,
+          trailing: const Icon(Icons.edit,
               color: Colors.white), // Add a trailing icon
           onTap: () {
             Navigator.of(context).push(

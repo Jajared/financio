@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financio/firebase/investment_collection.dart';
 import 'package:financio/models/investment_model.dart';
 import 'package:financio/models/watchlist_model.dart';
@@ -21,6 +22,14 @@ class EditWatchList extends StatefulWidget {
 }
 
 class EditWatchListState extends State<EditWatchList> {
+  List<DescriptionModel> descriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    descriptions = widget.watchlist.descriptions;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,10 +62,9 @@ class EditWatchListState extends State<EditWatchList> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: widget.watchlist.descriptions.length,
+              itemCount: descriptions.length,
               itemBuilder: (context, index) {
-                DescriptionModel description =
-                    widget.watchlist.descriptions[index];
+                DescriptionModel description = descriptions[index];
                 return ListTile(
                   title: Text(
                     description.description,
@@ -107,10 +115,10 @@ class EditWatchListState extends State<EditWatchList> {
                   flex: 1,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Add your logic here for the "Add New Watchlist Updates" button
+                      _showUpdateBottomSheet(context);
                     },
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: const Color.fromRGBO(135, 57, 249, 1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         )),
@@ -123,6 +131,97 @@ class EditWatchListState extends State<EditWatchList> {
           const SizedBox(height: 40),
         ],
       ),
+    );
+  }
+
+  // Function to show the bottom sheet
+  void _showUpdateBottomSheet(BuildContext context) {
+    TextEditingController _updateController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          color: const Color.fromRGBO(40, 40, 40, 1),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Add Update for ${widget.watchlist.ticker}',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(height: 30),
+              TextField(
+                controller: _updateController,
+                decoration: InputDecoration(
+                  hintText: 'Enter update...',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                        color: Color.fromRGBO(
+                            198, 81, 205, 1)), // Change the color here
+                    borderRadius: BorderRadius.circular(
+                        8), // You can adjust the radius as needed
+                  ),
+                ),
+                style: const TextStyle(color: Colors.white),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          child: const Text('Close'),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        flex: 1,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            String update = _updateController.text.trim();
+                            if (update.isNotEmpty) {
+                              DescriptionModel newUpdate = DescriptionModel(
+                                  description: update,
+                                  timestamp:
+                                      Timestamp.fromDate(DateTime.now()));
+                              List<DescriptionModel> updatedDescriptions =
+                                  List.of(descriptions)..add(newUpdate);
+
+                              WatchListModel updatedWatchListitem =
+                                  WatchListModel(
+                                      ticker: widget.watchlist.ticker,
+                                      descriptions: updatedDescriptions);
+                              InvestmentCollection.instance.updateWatchListItem(
+                                  widget.watchlist, updatedWatchListitem);
+                              setState(
+                                  () => descriptions = updatedDescriptions);
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          child: const Text('Update'),
+                        ),
+                      ),
+                    ],
+                  )),
+            ],
+          ),
+        );
+      },
     );
   }
 }
