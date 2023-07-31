@@ -67,7 +67,7 @@ class StockWatchListState extends State<StockWatchList> {
         itemCount: allWatchlistItems.length,
         itemBuilder: (context, index) {
           final item = allWatchlistItems[index];
-          return WatchlistItemCard(item: item);
+          return WatchlistItemCard(onDelete: _onDelete, item: item);
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -89,6 +89,12 @@ class StockWatchListState extends State<StockWatchList> {
   void _onAddToWatchlist(WatchListModel newWatchlistItem) {
     setState(() {
       allWatchlistItems.add(newWatchlistItem);
+    });
+  }
+
+  void _onDelete(WatchListModel watchlist) {
+    setState(() {
+      allWatchlistItems.remove(watchlist);
     });
   }
 }
