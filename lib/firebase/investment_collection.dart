@@ -180,4 +180,28 @@ class InvestmentCollection extends GetxController {
     };
     investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
   }
+
+  Future<void> deleteFromWatchList(WatchListModel watchListItem) async {
+    investmentRef.doc("test").update({
+      'watchlist': FieldValue.arrayRemove([watchListItem.toJson()])
+    });
+  }
+
+  Future<void> updateWatchListItem(WatchListModel watchListItem) async {
+    DocumentSnapshot snapshot = await investmentRef.doc("test").get();
+    Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
+    List<dynamic> currentWatchListData = currentData['watchlist'];
+    List<WatchListModel> currentWatchList = currentWatchListData
+        .map<WatchListModel>((item) => WatchListModel.fromJson(item))
+        .toList();
+    List<dynamic> newWatchListData =
+        currentWatchList.map((item) => item.toJson()).toList();
+    int index = currentWatchList
+        .indexWhere((element) => element.ticker == watchListItem.ticker);
+    newWatchListData[index] = watchListItem.toJson();
+    Map<String, dynamic> newInvestmentData = {
+      'watchlist': newWatchListData,
+    };
+    investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
+  }
 }

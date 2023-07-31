@@ -9,7 +9,7 @@ class WatchListModel {
   toJson() {
     return {
       'ticker': ticker,
-      'descriptions': descriptions,
+      'descriptions': descriptions.map((item) => item.toJson()).toList(),
     };
   }
 
