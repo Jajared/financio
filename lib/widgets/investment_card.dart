@@ -1,19 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financio/models/investment_model.dart';
 import 'package:financio/screens/sell_investment.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
 class InvestmentCard extends StatefulWidget {
-  final String tickerSymbol;
-  final double sharePrice;
-  final int quantity;
+  final InvestmentModel data;
+  final double totalValue;
   final Function(List<InvestmentModel>) onSell;
 
   const InvestmentCard(
       {Key? key,
-      required this.tickerSymbol,
-      required this.sharePrice,
-      required this.quantity,
+      required this.data,
+      required this.totalValue,
       required this.onSell})
       : super(key: key);
 
@@ -24,16 +23,22 @@ class InvestmentCard extends StatefulWidget {
 class _InvestmentCardState extends State<InvestmentCard> {
   String fullStockName = '';
   String logoUrl = '';
+  late String tickerSymbol = '';
+  late double sharePrice = 0;
+  late int quantity = 0;
 
   @override
   void initState() {
     super.initState();
     loadStockData();
+    tickerSymbol = widget.data.ticker;
+    sharePrice = widget.data.sharePrice;
+    quantity = widget.data.quantity;
   }
 
   Future<void> loadStockData() async {
-    fullStockName = await getStockFullName(widget.tickerSymbol);
-    final exchange = await getStockLogo(widget.tickerSymbol);
+    fullStockName = await getStockFullName(tickerSymbol);
+    final exchange = await getStockLogo(tickerSymbol);
     logoUrl = await getLogoUrl(exchange);
   }
 
@@ -50,13 +55,15 @@ class _InvestmentCardState extends State<InvestmentCard> {
 
   @override
   Widget build(BuildContext context) {
-    double totalValue = widget.sharePrice * widget.quantity;
+    double totalValue = sharePrice * quantity;
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => SellInvestment(
-              ticker: widget.tickerSymbol,
+              data: widget.data,
+              name: fullStockName,
+              totalValue: widget.totalValue,
               onSell: widget.onSell,
             ),
           ),
@@ -104,7 +111,7 @@ class _InvestmentCardState extends State<InvestmentCard> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                widget.tickerSymbol,
+                                tickerSymbol,
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Color.fromRGBO(255, 255, 255, 0.67),

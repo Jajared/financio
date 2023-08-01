@@ -174,9 +174,8 @@ class _InvestmentsState extends State<Investments> {
                 itemCount: investmentData.length,
                 itemBuilder: (context, index) {
                   return InvestmentCard(
-                    tickerSymbol: investmentData[index].ticker,
-                    sharePrice: investmentData[index].sharePrice,
-                    quantity: investmentData[index].quantity,
+                    data: investmentData[index],
+                    totalValue: totalValue,
                     onSell: _onSellInvestment,
                   );
                 },
