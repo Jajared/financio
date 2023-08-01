@@ -1,8 +1,8 @@
+import 'package:financio/screens/investment_statistics.dart';
 import 'package:financio/screens/watchlist.dart';
 import 'package:financio/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:financio/screens/add_investment.dart';
-import 'package:financio/widgets/investment_chart.dart';
 import 'package:financio/firebase/investment_collection.dart';
 import 'package:financio/models/investment_model.dart';
 import 'package:financio/widgets/investment_card.dart';
@@ -119,10 +119,7 @@ class _InvestmentsState extends State<Investments> {
         child: Column(
           children: [
             InvestmentSummary(
-              balance: totalValue,
-              profit: profit,
-            ),
-            SizedBox(height: 250, child: InvestmentChart(graphData: graphData)),
+                balance: totalValue, profit: profit, graphData: graphData),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -130,7 +127,14 @@ class _InvestmentsState extends State<Investments> {
                   CustomButton(
                     icon: Icons.bar_chart,
                     title: "Statistics",
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              InvestmentStatistics(graphData: graphData),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(width: 10),
                   CustomButton(
@@ -151,11 +155,11 @@ class _InvestmentsState extends State<Investments> {
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.only(left: 10),
+                padding: EdgeInsets.only(left: 10, bottom: 10),
                 child: Text(
-                  "Positions",
+                  "My Portfolio",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color.fromRGBO(255, 255, 255, 0.96),
                   ),
