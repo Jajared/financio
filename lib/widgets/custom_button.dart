@@ -41,7 +41,7 @@ class CustomButton extends StatelessWidget {
               title,
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.white, // Change the text color as needed
+                color: Colors.white,
               ),
             ),
           ],

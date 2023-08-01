@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 
 class PersonalCategoryChart extends StatefulWidget {
   final List<PersonalModel> transactionData;
-  final String type;
-  const PersonalCategoryChart(
-      {required this.transactionData, required this.type, Key? key})
+  const PersonalCategoryChart({required this.transactionData, Key? key})
       : super(key: key);
 
   @override
@@ -91,31 +89,32 @@ class PersoanlCategoryChartState extends State<PersonalCategoryChart> {
       });
       double total = 0;
       categoryMap.forEach((key, value) {
-        if (widget.type == "Income" ? value < 0 : value > 0) {
+        if (value < 0) {
+          total -= value.toDouble();
+        } else {
           total += value.toDouble();
         }
       });
       categoryMap.forEach((key, value) {
-        if (widget.type == "Income" ? value < 0 : value > 0) {
-          sections.add(PieChartSectionData(
-            color: sectionColors[key],
-            value: value / total * 100,
-            title: value.toString(),
-            radius: 100,
-            titleStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(255, 255, 255, 0.96),
-            ),
-            badgeWidget: _Badge(
-              key,
-              size: 40,
-              borderColor: Colors.black,
-            ),
-            badgePositionPercentageOffset: 1,
-          ));
-        }
+        sections.add(PieChartSectionData(
+          color: sectionColors[key],
+          value: value < 0 ? -value / total * 100 : value / total * 100,
+          title: value.toString(),
+          radius: 100,
+          titleStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Color.fromRGBO(255, 255, 255, 0.96),
+          ),
+          badgeWidget: _Badge(
+            key,
+            size: 40,
+            borderColor: Colors.black,
+          ),
+          badgePositionPercentageOffset: 1,
+        ));
       });
+
       return sections;
     }
 

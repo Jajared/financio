@@ -12,7 +12,15 @@ class PersonalStatistics extends StatefulWidget {
 }
 
 class _PersonalStatisticsState extends State<PersonalStatistics> {
-  String _statisticsType = 'Income'; // Flag to track which chart to show
+  String _statisticsType = 'Income';
+  List<PersonalModel> _filteredTransactionData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredTransactionData =
+        filterTransactionByType(_statisticsType, widget.transactionData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +43,6 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
           SizedBox(
             height: 48,
             child: Center(
-              // Center the ToggleButtons horizontally
               child: ToggleButtons(
                 borderRadius: BorderRadius.circular(8),
                 borderColor: Colors.white,
@@ -50,6 +57,8 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
                 onPressed: (index) {
                   setState(() {
                     _statisticsType = index == 0 ? "Income" : "Expenses";
+                    _filteredTransactionData = filterTransactionByType(
+                        _statisticsType, widget.transactionData);
                   });
                 },
                 children: const [
@@ -65,19 +74,92 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
           Expanded(
-            child: _statisticsType == 'Income'
-                ? PersonalCategoryChart(
-                    transactionData: widget.transactionData,
-                    type: 'Income',
-                  )
-                : PersonalCategoryChart(
-                    transactionData: widget.transactionData,
-                    type: 'Expenses',
-                  ),
+              child: PersonalCategoryChart(
+                  transactionData: _filteredTransactionData)),
+          const SizedBox(height: 20),
+          Expanded(
+            flex: 1,
+            child: ListView.builder(
+              itemCount: _filteredTransactionData.length,
+              itemBuilder: (context, index) {
+                return _buildListItem(
+                  _filteredTransactionData[index].category,
+                  _filteredTransactionData[index].amount,
+                );
+              },
+            ),
           ),
         ],
       ),
     );
+  }
+
+  filterTransactionByType(String type, List<PersonalModel> transactionData) {
+    return transactionData
+        .where((item) => type == "Income" ? item.amount < 0 : item.amount > 0)
+        .toList();
+  }
+
+  Widget _buildListItem(String category, double amount) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          _buildIcon(category),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              category,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Text(
+            amount < 0
+                ? '-\$${(amount * -1).toStringAsFixed(2)}'
+                : '+\$${amount.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIcon(String category) {
+    switch (category) {
+      case 'Transport':
+        return const Icon(Icons.directions_car, size: 26, color: Colors.blue);
+      case 'Food':
+        return const Icon(Icons.restaurant, size: 26, color: Colors.red);
+      case 'Shopping':
+        return const Icon(Icons.shopping_bag, size: 26, color: Colors.orange);
+      case 'Entertainment':
+        return const Icon(Icons.movie, size: 26, color: Colors.purple);
+      case 'Travel':
+        return const Icon(Icons.flight, size: 26, color: Colors.yellow);
+      case 'Health':
+        return const Icon(Icons.favorite, size: 26, color: Colors.pink);
+      case 'Education':
+        return const Icon(Icons.school, size: 26, color: Colors.green);
+      case 'Other':
+        return const Icon(Icons.category, size: 26, color: Colors.grey);
+      case 'Salary':
+        return const Icon(Icons.money, size: 26, color: Colors.green);
+      case 'Investment':
+        return const Icon(Icons.attach_money, size: 26, color: Colors.blue);
+      case 'Gift':
+        return const Icon(Icons.card_giftcard, size: 26, color: Colors.green);
+      case 'Other Income':
+        return const Icon(Icons.category, size: 26, color: Colors.grey);
+      default:
+        return const Icon(Icons.category, size: 26, color: Colors.grey);
+    }
   }
 }

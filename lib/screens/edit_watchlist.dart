@@ -77,15 +77,13 @@ class EditWatchListState extends State<EditWatchList> {
                     style: const TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.96)),
                   ),
-                  // You can add any other UI components you want for each description
                 );
               },
             ),
           ),
           const SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 20), // Add horizontal padding
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 Expanded(
@@ -102,15 +100,13 @@ class EditWatchListState extends State<EditWatchList> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(198, 81, 205, 1),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            8), // Adjust border radius as needed Add border
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: const Text("Add to Investment"),
                   ),
                 ),
-                const SizedBox(
-                    width: 20), // Add some spacing between the buttons
+                const SizedBox(width: 20),
                 Expanded(
                   flex: 1,
                   child: ElevatedButton(
@@ -159,10 +155,8 @@ class EditWatchListState extends State<EditWatchList> {
                   hintText: 'Enter update...',
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(
-                        color: Color.fromRGBO(
-                            198, 81, 205, 1)), // Change the color here
-                    borderRadius: BorderRadius.circular(
-                        8), // You can adjust the radius as needed
+                        color: Color.fromRGBO(198, 81, 205, 1)),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 style: const TextStyle(color: Colors.white),
