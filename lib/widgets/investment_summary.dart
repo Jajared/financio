@@ -123,6 +123,7 @@ class InvestmentChartState extends State<InvestmentChart> {
   List<Color> gradientColors = [Colors.white, Colors.white];
 
   bool showAvg = false;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -193,7 +194,7 @@ class InvestmentChartState extends State<InvestmentChart> {
       minX: 0,
       maxX: 6,
       minY: 0,
-      maxY: 4,
+      maxY: 5,
       lineBarsData: [
         lineChartBarData,
       ],

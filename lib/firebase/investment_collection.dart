@@ -104,7 +104,7 @@ class InvestmentCollection extends GetxController {
       if (currentHolding.ticker == event.ticker) {
         int currentQuantity = currentHolding.quantity;
         int newQuantity = currentQuantity - event.quantity;
-        if (currentQuantity == newQuantity) {
+        if (newQuantity == 0) {
           currentHoldings.removeAt(i);
         } else {
           double currentPrice = currentHolding.sharePrice.toDouble();
@@ -128,6 +128,7 @@ class InvestmentCollection extends GetxController {
     currentGraphData[currentGraphData.length - 1] = lastEntry;
 
     // Update the new investment data
+    currentHoldingsJson = currentHoldings.map((item) => item.toJson()).toList();
     Map<String, dynamic> newInvestmentData = {
       'holdings': currentHoldingsJson,
       'summary': {

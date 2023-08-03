@@ -6,7 +6,7 @@ import 'dart:convert';
 class InvestmentCard extends StatefulWidget {
   final InvestmentModel data;
   final double totalValue;
-  final Function(List<InvestmentModel>) onSell;
+  final Function(InvestmentModel) onSell;
 
   const InvestmentCard(
       {Key? key,
@@ -52,6 +52,13 @@ class _InvestmentCardState extends State<InvestmentCard> {
     }
   }
 
+  void _onSellInvestment(InvestmentModel sellInvestmentEvent) {
+    widget.onSell(sellInvestmentEvent);
+    setState(() {
+      quantity -= sellInvestmentEvent.quantity;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double totalValue = sharePrice * quantity;
@@ -63,7 +70,7 @@ class _InvestmentCardState extends State<InvestmentCard> {
               data: widget.data,
               name: fullStockName,
               totalValue: widget.totalValue,
-              onSell: widget.onSell,
+              onSell: _onSellInvestment,
             ),
           ),
         );

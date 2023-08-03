@@ -170,7 +170,7 @@ class AddInvestmentState extends State<AddInvestment> {
     );
   }
 
-  void _saveInvestment() {
+  void _saveInvestment() async {
     String ticker = _tickerController.text;
     String quantityText = _quantityController.text;
     String priceText = _priceController.text;
@@ -211,8 +211,8 @@ class AddInvestmentState extends State<AddInvestment> {
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
     try {
-      ActivityCollection.instance.addActivity(newActivity);
-      InvestmentCollection.instance.addInvestment(newInvestment);
+      await ActivityCollection.instance.addActivity(newActivity);
+      await InvestmentCollection.instance.addInvestment(newInvestment);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -223,6 +223,7 @@ class AddInvestmentState extends State<AddInvestment> {
     widget.addInvestment(newInvestment);
   }
 
+  // Load ticker symbols from JSON file
   Future<void> loadTickerSymbols() async {
     String jsonData = await DefaultAssetBundle.of(context)
         .loadString('lib/assets/stock_tickers.json');
@@ -232,6 +233,7 @@ class AddInvestmentState extends State<AddInvestment> {
     allTickerSymbols = result;
   }
 
+  // Search for ticker symbols
   void searchTickerSymbols(String query) {
     if (query.isEmpty) {
       setState(() {

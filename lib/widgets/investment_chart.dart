@@ -17,8 +17,19 @@ class InvestmentChartState extends State<InvestmentChart> {
     const Color.fromRGBO(198, 81, 205, 1),
     const Color.fromRGBO(135, 57, 249, 1)
   ];
-
+  double maxY = 0;
   bool showAvg = false;
+
+  @override
+  void initState() {
+    super.initState();
+    maxY = widget.graphData
+            .reduce((curr, next) =>
+                curr['value'] > next['value'] ? curr : next)['value']
+            .toDouble() /
+        1000;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -79,7 +90,6 @@ class InvestmentChartState extends State<InvestmentChart> {
       fontSize: 15,
       color: Color.fromRGBO(255, 255, 255, 0.67),
     );
-
     String text;
     if (value < 1000) {
       text = '${value.toInt()}k';
@@ -133,7 +143,7 @@ class InvestmentChartState extends State<InvestmentChart> {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 1,
+            interval: maxY / 5,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 42,
           ),
@@ -156,7 +166,6 @@ class InvestmentChartState extends State<InvestmentChart> {
   LineChartData avgData() {
     LineChartBarData lineChartBarData =
         convertToLineChartBarData(widget.graphData);
-
     return LineChartData(
       lineTouchData: const LineTouchData(enabled: false),
       gridData: FlGridData(
@@ -192,7 +201,7 @@ class InvestmentChartState extends State<InvestmentChart> {
             showTitles: true,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 42,
-            interval: 1,
+            interval: maxY / 5,
           ),
         ),
         topTitles: const AxisTitles(

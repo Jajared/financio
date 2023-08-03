@@ -12,7 +12,7 @@ class SellInvestment extends StatefulWidget {
   final InvestmentModel data;
   final String name;
   final double totalValue;
-  final Function(List<InvestmentModel>) onSell;
+  final Function(InvestmentModel) onSell;
   const SellInvestment(
       {Key? key,
       required this.data,
@@ -32,6 +32,7 @@ class SellInvestmentState extends State<SellInvestment> {
   late String tickerSymbol = '';
   late double sharePrice = 0;
   late int quantity = 0;
+  late double totalValue = 0;
   late Timestamp timestamp = Timestamp.fromDate(DateTime.now());
 
   @override
@@ -41,6 +42,7 @@ class SellInvestmentState extends State<SellInvestment> {
     sharePrice = widget.data.sharePrice;
     quantity = widget.data.quantity;
     timestamp = widget.data.timestamp;
+    totalValue = widget.totalValue;
   }
 
   @override
@@ -77,18 +79,20 @@ class SellInvestmentState extends State<SellInvestment> {
                     color: Colors.white.withOpacity(0.96))),
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text("Date bought", style: TextStyle(color: Colors.white)),
+              const Text("Date bought", style: TextStyle(color: Colors.white)),
               Text(DateFormat('MMM d').format(timestamp.toDate()),
+                  style: const TextStyle(color: Colors.white)),
+            ]),
+            const SizedBox(height: 10),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text("Shares owned", style: TextStyle(color: Colors.white)),
+              Text(quantity.toString(),
+                  style: const TextStyle(color: Colors.white)),
+            ]),
+            const SizedBox(height: 10),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text("Average price",
                   style: TextStyle(color: Colors.white)),
-            ]),
-            const SizedBox(height: 10),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text("Shares owned", style: TextStyle(color: Colors.white)),
-              Text(quantity.toString(), style: TextStyle(color: Colors.white)),
-            ]),
-            const SizedBox(height: 10),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text("Average price", style: TextStyle(color: Colors.white)),
               Text('\$${sharePrice.toStringAsFixed(2)}',
                   style: TextStyle(color: Colors.white)),
             ]),
@@ -125,7 +129,7 @@ class SellInvestmentState extends State<SellInvestment> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Sell ${tickerSymbol}',
+              Text('Sell $tickerSymbol',
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -204,13 +208,13 @@ class SellInvestmentState extends State<SellInvestment> {
         child: Row(children: [
       CircularPercentIndicator(
         radius: 40.0,
-        percent: quantity * sharePrice / widget.totalValue,
+        percent: quantity * sharePrice / totalValue,
         lineWidth: 10.0,
         animation: true,
         circularStrokeCap: CircularStrokeCap.round,
         progressColor: const Color.fromRGBO(198, 81, 205, 1),
         center: Text(
-          '${(quantity * sharePrice / widget.totalValue * 100).toPrecision(1)}%',
+          '${(quantity * sharePrice / totalValue * 100).toPrecision(1)}%',
           style: const TextStyle(color: Colors.white),
         ),
       ),
@@ -231,11 +235,19 @@ class SellInvestmentState extends State<SellInvestment> {
       );
       return;
     }
-    int quantity;
-    double price;
+    int quantitySold;
+    double priceSold;
     try {
-      quantity = int.parse(quantityText);
-      price = double.parse(priceText);
+      quantitySold = int.parse(quantityText);
+      priceSold = double.parse(priceText);
+      if (quantitySold > quantity) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('You do not own that many shares'),
+          ),
+        );
+        return;
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -244,26 +256,24 @@ class SellInvestmentState extends State<SellInvestment> {
       );
       return;
     }
-    InvestmentModel newInvestment = InvestmentModel(
+    InvestmentModel sellInvestmentEvent = InvestmentModel(
       ticker: tickerSymbol,
-      quantity: quantity,
-      sharePrice: price,
+      quantity: quantitySold,
+      sharePrice: priceSold,
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
     ActivityModel newActivity = ActivityModel(
-      title: 'Sold $quantity shares of ${tickerSymbol}',
+      title: 'Sold $quantitySold shares of $tickerSymbol',
       type: 'Investment',
       timestamp: Timestamp.fromDate(DateTime.now()),
     );
-    /* setState(() {
-      widget.quantity -= quantity;
-      widget.totalValue -= quantity * price;
-    }) */
+    setState(() {
+      quantity -= quantitySold;
+      totalValue -= quantitySold * sharePrice;
+    });
     try {
       ActivityCollection.instance.addActivity(newActivity);
-      List<InvestmentModel> updatedInvestments =
-          await InvestmentCollection.instance.sellInvestment(newInvestment);
-      widget.onSell(updatedInvestments);
+      widget.onSell(sellInvestmentEvent);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

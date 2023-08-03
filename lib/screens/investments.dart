@@ -93,7 +93,9 @@ class _InvestmentsState extends State<Investments> {
     _getSummaryData();
   }
 
-  void _onSellInvestment(List<InvestmentModel> updatedInvestments) {
+  void _onSellInvestment(InvestmentModel sellInvestmentEvent) async {
+    List<InvestmentModel> updatedInvestments =
+        await InvestmentCollection.instance.sellInvestment(sellInvestmentEvent);
     setState(() {
       investmentData = updatedInvestments;
     });
@@ -166,21 +168,28 @@ class _InvestmentsState extends State<Investments> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: investmentData.length,
-                itemBuilder: (context, index) {
-                  return InvestmentCard(
-                    data: investmentData[index],
-                    totalValue: totalValue,
-                    onSell: _onSellInvestment,
-                  );
-                },
-              ),
-            ),
+            investmentData != []
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: investmentData.length,
+                      itemBuilder: (context, index) {
+                        return InvestmentCard(
+                          data: investmentData[index],
+                          totalValue: totalValue,
+                          onSell: _onSellInvestment,
+                        );
+                      },
+                    ),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 30),
+                    child: Text(
+                      "You are not holding any investments",
+                      style: TextStyle(color: Colors.white),
+                    )),
           ],
         ),
       ),
