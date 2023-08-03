@@ -136,85 +136,90 @@ class EditWatchListState extends State<EditWatchList> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          color: const Color.fromRGBO(40, 40, 40, 1),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Add Update for ${widget.watchlist.ticker}',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold)),
-              const SizedBox(height: 30),
-              TextField(
-                controller: _updateController,
-                decoration: InputDecoration(
-                  hintText: 'Enter update...',
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                        color: Color.fromRGBO(198, 81, 205, 1)),
-                    borderRadius: BorderRadius.circular(8),
+        return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              color: const Color.fromRGBO(40, 40, 40, 1),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Add Update for ${widget.watchlist.ticker}',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 30),
+                  TextField(
+                    controller: _updateController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter update...',
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(198, 81, 205, 1)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                    maxLines: 3,
                   ),
-                ),
-                style: const TextStyle(color: Colors.white),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
+                  const SizedBox(height: 16),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              child: const Text('Close'),
+                            ),
                           ),
-                          child: const Text('Close'),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            String update = _updateController.text.trim();
-                            if (update.isNotEmpty) {
-                              DescriptionModel newUpdate = DescriptionModel(
-                                  description: update,
-                                  timestamp:
-                                      Timestamp.fromDate(DateTime.now()));
-                              List<DescriptionModel> updatedDescriptions =
-                                  List.of(descriptions)..add(newUpdate);
+                          const SizedBox(width: 20),
+                          Expanded(
+                            flex: 1,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                String update = _updateController.text.trim();
+                                if (update.isNotEmpty) {
+                                  DescriptionModel newUpdate = DescriptionModel(
+                                      description: update,
+                                      timestamp:
+                                          Timestamp.fromDate(DateTime.now()));
+                                  List<DescriptionModel> updatedDescriptions =
+                                      List.of(descriptions)..add(newUpdate);
 
-                              WatchListModel updatedWatchListitem =
-                                  WatchListModel(
-                                      ticker: widget.watchlist.ticker,
-                                      descriptions: updatedDescriptions);
-                              InvestmentCollection.instance.updateWatchListItem(
-                                  widget.watchlist, updatedWatchListitem);
-                              setState(
-                                  () => descriptions = updatedDescriptions);
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                                  WatchListModel updatedWatchListitem =
+                                      WatchListModel(
+                                          ticker: widget.watchlist.ticker,
+                                          descriptions: updatedDescriptions);
+                                  InvestmentCollection.instance
+                                      .updateWatchListItem(widget.watchlist,
+                                          updatedWatchListitem);
+                                  setState(
+                                      () => descriptions = updatedDescriptions);
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                              ),
+                              child: const Text('Update'),
+                            ),
                           ),
-                          child: const Text('Update'),
-                        ),
-                      ),
-                    ],
-                  )),
-            ],
-          ),
-        );
+                        ],
+                      )),
+                ],
+              ),
+            ));
       },
     );
   }

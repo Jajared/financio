@@ -88,7 +88,6 @@ class InvestmentCollection extends GetxController {
     DocumentSnapshot snapshot = await investmentRef.doc("test").get();
     Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
 
-    double profit = 0;
     // Convert currentData['holdings'] to List<InvestmentModel>
     List<dynamic> currentHoldingsData = currentData['holdings'];
     List<InvestmentModel> currentHoldings = currentHoldingsData
@@ -97,6 +96,7 @@ class InvestmentCollection extends GetxController {
     List<dynamic> currentHoldingsJson =
         currentHoldings.map((item) => item.toJson()).toList();
     List<dynamic> currentGraphData = currentData['summary']['graphData'];
+    double currentProfit = currentData['summary']['profit'].toDouble();
     double totalValue = currentGraphData.last['value'].toDouble();
     // Check if the event ticker is present in the current holdings
     for (int i = 0; i < currentHoldings.length; i++) {
@@ -115,7 +115,7 @@ class InvestmentCollection extends GetxController {
             timestamp: currentHolding.timestamp,
           );
           currentHoldings[i] = updatedHolding;
-          profit = (event.sharePrice - currentPrice) * event.quantity;
+          currentProfit += (event.sharePrice - currentPrice) * event.quantity;
         }
         totalValue = totalValue - (currentHolding.sharePrice * event.quantity);
         break;
@@ -132,7 +132,7 @@ class InvestmentCollection extends GetxController {
     Map<String, dynamic> newInvestmentData = {
       'holdings': currentHoldingsJson,
       'summary': {
-        'profit': profit,
+        'profit': currentProfit,
         'graphData': currentGraphData,
       }
     };

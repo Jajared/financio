@@ -38,8 +38,8 @@ class InvestmentChartState extends State<InvestmentChart> {
           aspectRatio: 1.70,
           child: Padding(
             padding: const EdgeInsets.only(
-              right: 20,
-              left: 10,
+              right: 30,
+              left: 30,
               top: 24,
             ),
             child: LineChart(
@@ -92,7 +92,7 @@ class InvestmentChartState extends State<InvestmentChart> {
     );
     String text;
     if (value < 1000) {
-      text = '${value.toInt()}k';
+      text = '${(value * 1000).toInt()}';
     } else if (value < 1000000) {
       text = '${(value / 1000).toStringAsFixed(2)}k';
     } else {
@@ -156,7 +156,7 @@ class InvestmentChartState extends State<InvestmentChart> {
       minX: 0,
       maxX: 6,
       minY: 0,
-      maxY: 4,
+      maxY: maxY,
       lineBarsData: [
         lineChartBarData,
       ],

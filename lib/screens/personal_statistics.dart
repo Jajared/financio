@@ -14,6 +14,7 @@ class PersonalStatistics extends StatefulWidget {
 class _PersonalStatisticsState extends State<PersonalStatistics> {
   String _statisticsType = 'Income';
   List<PersonalModel> _filteredTransactionData = [];
+  String selectedTimeFrame = '1W';
 
   @override
   void initState() {
@@ -78,7 +79,16 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
           Expanded(
               child: PersonalCategoryChart(
                   transactionData: _filteredTransactionData)),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildTimeFrameButton('1W'),
+              _buildTimeFrameButton('1M'),
+              _buildTimeFrameButton('6M'),
+            ],
+          ),
+          const SizedBox(height: 10),
           Expanded(
             flex: 1,
             child: ListView.builder(
@@ -161,5 +171,26 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
       default:
         return const Icon(Icons.category, size: 26, color: Colors.grey);
     }
+  }
+
+  ElevatedButton _buildTimeFrameButton(String timeFrame) {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          selectedTimeFrame = timeFrame;
+        });
+        // Add your logic to handle changing the time frame in the chart
+        // You can use the selectedTimeFrame variable here to determine the selected option.
+        // For example, you can pass this value to your InvestmentChart widget to update the data accordingly.
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: selectedTimeFrame == timeFrame
+            ? const Color.fromRGBO(198, 81, 205, 1)
+            : const Color.fromRGBO(56, 56, 56, 1),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        side: BorderSide.none,
+      ),
+      child: Text(timeFrame),
+    );
   }
 }

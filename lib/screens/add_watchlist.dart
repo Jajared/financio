@@ -44,8 +44,7 @@ class AddWatchlistState extends State<AddWatchlist> {
           children: [
             _tickerBox('Ticker', 'Enter ticker'),
             const SizedBox(height: 16),
-            _inputBox('Description', 'Enter description',
-                keyboardType: TextInputType.number),
+            _inputBox('Description', 'Enter description'),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {

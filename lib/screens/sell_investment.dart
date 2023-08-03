@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financio/firebase/activity_collection.dart';
-import 'package:financio/firebase/investment_collection.dart';
 import 'package:financio/models/investment_model.dart';
 import 'package:financio/models/activity_model.dart';
 import 'package:flutter/material.dart';
@@ -122,60 +121,65 @@ class SellInvestmentState extends State<SellInvestment> {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          color: const Color.fromRGBO(40, 40, 40, 1),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Sell $tickerSymbol',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold)),
-              const SizedBox(height: 30),
-              _inputBox('Quantity', 'Enter amount',
-                  keyboardType: TextInputType.number),
-              const SizedBox(height: 16),
-              _inputBox('Share Price', 'Enter price',
-                  keyboardType: TextInputType.number),
-              const SizedBox(height: 16),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
+        return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              color: const Color.fromRGBO(40, 40, 40, 1),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Sell $tickerSymbol',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 30),
+                  _inputBox('Quantity', 'Enter amount',
+                      keyboardType: TextInputType.number),
+                  const SizedBox(height: 16),
+                  _inputBox('Share Price', 'Enter price',
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true)),
+                  const SizedBox(height: 16),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              child: const Text('Close'),
+                            ),
                           ),
-                          child: const Text('Close'),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _saveInvestment();
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                          const SizedBox(width: 20),
+                          Expanded(
+                            flex: 1,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _saveInvestment();
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                              ),
+                              child: const Text('Sell'),
+                            ),
                           ),
-                          child: const Text('Sell'),
-                        ),
-                      ),
-                    ],
-                  )),
-            ],
-          ),
-        );
+                        ],
+                      )),
+                ],
+              ),
+            ));
       },
     );
   }
