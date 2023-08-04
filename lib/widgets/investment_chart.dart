@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 
 class InvestmentChart extends StatefulWidget {
   final List<dynamic> graphData;
+  final String timeFrame;
   const InvestmentChart({
     Key? key,
     required this.graphData,
+    required this.timeFrame,
   }) : super(key: key);
 
   @override
@@ -19,6 +21,8 @@ class InvestmentChartState extends State<InvestmentChart> {
   ];
   double maxY = 0;
   bool showAvg = false;
+  late String selectedTimeFrame;
+  FlSpot? touchedSpot;
 
   @override
   void initState() {
@@ -28,6 +32,17 @@ class InvestmentChartState extends State<InvestmentChart> {
                 curr['value'] > next['value'] ? curr : next)['value']
             .toDouble() /
         1000;
+    selectedTimeFrame = widget.timeFrame;
+  }
+
+  @override
+  void didUpdateWidget(InvestmentChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.timeFrame != oldWidget.timeFrame) {
+      setState(() {
+        selectedTimeFrame = widget.timeFrame;
+      });
+    }
   }
 
   @override
@@ -38,12 +53,30 @@ class InvestmentChartState extends State<InvestmentChart> {
           aspectRatio: 1.70,
           child: Padding(
             padding: const EdgeInsets.only(
-              right: 30,
-              left: 30,
+              right: 25,
+              left: 25,
               top: 24,
             ),
-            child: LineChart(
-              showAvg ? avgData() : mainData(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  getDateFromSpot(touchedSpot),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(
+                    child: LineChart(
+                  showAvg ? avgData() : mainData(),
+                ))
+              ],
             ),
           ),
         ),
@@ -69,21 +102,6 @@ class InvestmentChartState extends State<InvestmentChart> {
     );
   }
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-      color: Color.fromRGBO(255, 255, 255, 0.67),
-    );
-    DateTime currentDate = DateTime.now();
-    DateTime day = currentDate.subtract(Duration(days: 6 - value.toInt()));
-    String text = '${day.day}/${day.month}';
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: Text(text, style: style),
-    );
-  }
-
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
@@ -106,6 +124,43 @@ class InvestmentChartState extends State<InvestmentChart> {
     LineChartBarData lineChartBarData =
         convertToLineChartBarData(widget.graphData);
     return LineChartData(
+      lineTouchData: LineTouchData(
+        enabled: true,
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: Colors.transparent,
+          tooltipPadding: const EdgeInsets.all(0),
+          tooltipRoundedRadius: 8,
+          getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+            return touchedBarSpots.map((barSpot) {
+              final flSpot = barSpot;
+              if (flSpot.x == 0 || flSpot.x == 6) {
+                return null;
+              }
+
+              return LineTooltipItem(
+                '${(flSpot.y.toDouble() * 1000).toInt()}',
+                const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            }).toList();
+          },
+        ),
+        touchCallback: (FlTouchEvent event, LineTouchResponse? touchResponse) {
+          if (touchResponse?.lineBarSpots != null &&
+              touchResponse!.lineBarSpots!.length == 1) {
+            setState(() {
+              touchedSpot = touchResponse.lineBarSpots![0];
+            });
+          } else {
+            setState(() {
+              touchedSpot = null;
+            });
+          }
+        },
+        handleBuiltInTouches: true,
+      ),
       gridData: FlGridData(
         show: false,
         drawVerticalLine: true,
@@ -132,12 +187,9 @@ class InvestmentChartState extends State<InvestmentChart> {
         topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-        bottomTitles: AxisTitles(
+        bottomTitles: const AxisTitles(
           sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            interval: 1,
-            getTitlesWidget: bottomTitleWidgets,
+            showTitles: false,
           ),
         ),
         leftTitles: AxisTitles(
@@ -154,7 +206,11 @@ class InvestmentChartState extends State<InvestmentChart> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 6,
+      maxX: (selectedTimeFrame == "1W"
+          ? 7
+          : selectedTimeFrame == "1M"
+              ? 30
+              : 180),
       minY: 0,
       maxY: maxY,
       lineBarsData: [
@@ -188,12 +244,9 @@ class InvestmentChartState extends State<InvestmentChart> {
       ),
       titlesData: FlTitlesData(
         show: true,
-        bottomTitles: AxisTitles(
+        bottomTitles: const AxisTitles(
           sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: bottomTitleWidgets,
-            interval: 1,
+            showTitles: false,
           ),
         ),
         leftTitles: AxisTitles(
@@ -216,7 +269,11 @@ class InvestmentChartState extends State<InvestmentChart> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 6,
+      maxX: (selectedTimeFrame == "1W"
+          ? 7
+          : selectedTimeFrame == "1M"
+              ? 30
+              : 180),
       minY: 0,
       maxY: 4,
       lineBarsData: [
@@ -227,16 +284,34 @@ class InvestmentChartState extends State<InvestmentChart> {
 
   LineChartBarData convertToLineChartBarData(List<dynamic> graphData) {
     List<FlSpot> spots = [];
-    int startIndex =
-        graphData.length > 7 ? graphData.length - 7 : graphData.length - 1;
+    int dataCount = 0;
+    int startIndex = 0;
+    if (selectedTimeFrame == "1W") {
+      // Get last 7 days of data
+      startIndex =
+          graphData.length > 7 ? graphData.length - 7 : graphData.length - 1;
+      dataCount = 7;
+    } else if (selectedTimeFrame == "1M") {
+      // Get last 30 days of data
+      startIndex =
+          graphData.length > 30 ? graphData.length - 30 : graphData.length - 1;
+      dataCount = 30;
+    } else if (selectedTimeFrame == "6M") {
+      // Get last 6 months of data
+      startIndex = graphData.length > 180
+          ? graphData.length - 180
+          : graphData.length - 1;
+      dataCount = 180;
+    }
     for (int i = startIndex; i >= 0; i--) {
       double value = graphData[i]['value'].toDouble();
-      FlSpot spot = FlSpot((6 + i - startIndex).toDouble(), value / 1000);
+      FlSpot spot =
+          FlSpot((dataCount - 1 + i - startIndex).toDouble(), value / 1000);
       spots.insert(0, spot);
     }
 
-    while (spots.length < 7) {
-      spots.insert(0, FlSpot((6 - spots.length).toDouble(), 0));
+    while (spots.length < dataCount) {
+      spots.insert(0, FlSpot((dataCount - 1 - spots.length).toDouble(), 0));
     }
 
     return LineChartBarData(
@@ -256,5 +331,21 @@ class InvestmentChartState extends State<InvestmentChart> {
         ),
       ),
     );
+  }
+
+  String getDateFromSpot(FlSpot? spot) {
+    if (spot == null) {
+      return '';
+    }
+    int dataCount = (selectedTimeFrame == "1W"
+        ? 7
+        : selectedTimeFrame == "1M"
+            ? 30
+            : 180);
+    int index = spot.x.toInt();
+    DateTime currentDate = DateTime.now();
+    DateTime day = currentDate.subtract(Duration(days: dataCount - 1 - index));
+    String text = '${day.day}/${day.month}';
+    return text;
   }
 }

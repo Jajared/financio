@@ -40,7 +40,8 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
             ],
           ),
           const SizedBox(height: 20),
-          InvestmentChart(graphData: widget.graphData),
+          InvestmentChart(
+              graphData: widget.graphData, timeFrame: selectedTimeFrame),
         ],
       ),
     );
@@ -52,9 +53,6 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
         setState(() {
           selectedTimeFrame = timeFrame;
         });
-        // Add your logic to handle changing the time frame in the chart
-        // You can use the selectedTimeFrame variable here to determine the selected option.
-        // For example, you can pass this value to your InvestmentChart widget to update the data accordingly.
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: selectedTimeFrame == timeFrame
