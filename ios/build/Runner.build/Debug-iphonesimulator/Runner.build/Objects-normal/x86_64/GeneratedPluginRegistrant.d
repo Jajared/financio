@@ -1,0 +1,20 @@
+dependencies: \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/Runner/GeneratedPluginRegistrant.m \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/Runner/GeneratedPluginRegistrant.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Modules/module.modulemap \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/Flutter.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterAppDelegate.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterMacros.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterPlugin.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterBinaryMessenger.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterChannels.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterCodecs.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterPlatformViews.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterTexture.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterCallbackCache.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterDartProject.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterEngine.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterEngineGroup.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterHeadlessDartRunner.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h \
+  /Users/hungryjared/Desktop/NUS/Projects/financio/ios/build/Debug-iphonesimulator/Flutter.framework/Headers/FlutterViewController.h

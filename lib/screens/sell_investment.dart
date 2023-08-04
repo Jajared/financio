@@ -93,7 +93,7 @@ class SellInvestmentState extends State<SellInvestment> {
               const Text("Average price",
                   style: TextStyle(color: Colors.white)),
               Text('\$${sharePrice.toStringAsFixed(2)}',
-                  style: TextStyle(color: Colors.white)),
+                  style: const TextStyle(color: Colors.white)),
             ]),
             const Expanded(
               child: SizedBox(),
@@ -208,8 +208,7 @@ class SellInvestmentState extends State<SellInvestment> {
   }
 
   Widget investmentData() {
-    return Container(
-        child: Row(children: [
+    return Row(children: [
       CircularPercentIndicator(
         radius: 40.0,
         percent: quantity * sharePrice / totalValue,
@@ -225,7 +224,7 @@ class SellInvestmentState extends State<SellInvestment> {
       const SizedBox(width: 10),
       const Text("of your portfolio",
           style: TextStyle(fontSize: 16, color: Colors.white)),
-    ]));
+    ]);
   }
 
   void _saveInvestment() async {

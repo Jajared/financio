@@ -66,7 +66,8 @@ class AddInvestmentState extends State<AddInvestment> {
                 keyboardType: TextInputType.number),
             const SizedBox(height: 16),
             _inputBox('Share Price', 'Enter price',
-                keyboardType: TextInputType.number),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {

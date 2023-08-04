@@ -1,0 +1,6 @@
+version: "Apple Swift version 5.8.1 (swiftlang-5.8.0.124.5 clang-1403.0.22.11.100)"
+options: "78625a224fcf7cc16abf4daf7aa812ac9cd5a99f5319e11379dac234b6e7b955"
+build_start_time: [1691148345, 994630000]
+build_end_time: [1691148346, 26842000]
+inputs:
+  "/Users/hungryjared/Desktop/NUS/Projects/financio/ios/Runner/AppDelegate.swift": !private [1685724492, 0]
