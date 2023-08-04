@@ -86,9 +86,11 @@ class _InvestmentsState extends State<Investments> {
     }
   }
 
-  void _onNewInvestmentAdded(InvestmentModel newTransaction) {
+  void _onNewInvestmentAdded(InvestmentModel newTransaction) async {
+    List<InvestmentModel> updatedInvestments =
+        await InvestmentCollection.instance.addInvestment(newTransaction);
     setState(() {
-      investmentData.add(newTransaction);
+      investmentData = updatedInvestments;
     });
     _getSummaryData();
   }

@@ -31,6 +31,10 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 10),
+          InvestmentChart(
+              graphData: widget.graphData, timeFrame: selectedTimeFrame),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -39,9 +43,6 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
               _buildTimeFrameButton('6M'),
             ],
           ),
-          const SizedBox(height: 20),
-          InvestmentChart(
-              graphData: widget.graphData, timeFrame: selectedTimeFrame),
         ],
       ),
     );

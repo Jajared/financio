@@ -213,7 +213,7 @@ class AddInvestmentState extends State<AddInvestment> {
     );
     try {
       await ActivityCollection.instance.addActivity(newActivity);
-      await InvestmentCollection.instance.addInvestment(newInvestment);
+      await widget.addInvestment(newInvestment);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -221,7 +221,6 @@ class AddInvestmentState extends State<AddInvestment> {
         ),
       );
     }
-    widget.addInvestment(newInvestment);
   }
 
   // Load ticker symbols from JSON file

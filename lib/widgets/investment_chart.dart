@@ -1,5 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class InvestmentChart extends StatefulWidget {
   final List<dynamic> graphData;
@@ -23,6 +25,7 @@ class InvestmentChartState extends State<InvestmentChart> {
   bool showAvg = false;
   late String selectedTimeFrame;
   FlSpot? touchedSpot;
+  FlSpot? _previousTouchedSpot;
 
   @override
   void initState() {
@@ -50,32 +53,24 @@ class InvestmentChartState extends State<InvestmentChart> {
     return Stack(
       children: <Widget>[
         AspectRatio(
-          aspectRatio: 1.70,
+          aspectRatio: 1.5,
           child: Padding(
             padding: const EdgeInsets.only(
               right: 25,
               left: 25,
-              top: 24,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  getDateFromSpot(touchedSpot),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                statisticsSummary(touchedSpot),
                 const SizedBox(
                   height: 20,
                 ),
                 Expanded(
+                    flex: 1,
                     child: LineChart(
-                  showAvg ? avgData() : mainData(),
-                ))
+                      showAvg ? avgData() : mainData(),
+                    ))
               ],
             ),
           ),
@@ -132,27 +127,23 @@ class InvestmentChartState extends State<InvestmentChart> {
           tooltipRoundedRadius: 8,
           getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
             return touchedBarSpots.map((barSpot) {
-              final flSpot = barSpot;
-              if (flSpot.x == 0 || flSpot.x == 6) {
-                return null;
-              }
-
-              return LineTooltipItem(
-                '${(flSpot.y.toDouble() * 1000).toInt()}',
-                const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
+              return null;
             }).toList();
           },
         ),
         touchCallback: (FlTouchEvent event, LineTouchResponse? touchResponse) {
           if (touchResponse?.lineBarSpots != null &&
               touchResponse!.lineBarSpots!.length == 1) {
-            setState(() {
-              touchedSpot = touchResponse.lineBarSpots![0];
-            });
+            final newTouchedSpot = touchResponse.lineBarSpots![0];
+            if (_previousTouchedSpot == null ||
+                newTouchedSpot.x != _previousTouchedSpot!.x ||
+                newTouchedSpot.y != _previousTouchedSpot!.y) {
+              setState(() {
+                touchedSpot = newTouchedSpot;
+                _previousTouchedSpot = newTouchedSpot;
+              });
+              HapticFeedback.selectionClick();
+            }
           } else {
             setState(() {
               touchedSpot = null;
@@ -333,10 +324,7 @@ class InvestmentChartState extends State<InvestmentChart> {
     );
   }
 
-  String getDateFromSpot(FlSpot? spot) {
-    if (spot == null) {
-      return '';
-    }
+  String getDateFromSpot(FlSpot spot) {
     int dataCount = (selectedTimeFrame == "1W"
         ? 7
         : selectedTimeFrame == "1M"
@@ -345,7 +333,78 @@ class InvestmentChartState extends State<InvestmentChart> {
     int index = spot.x.toInt();
     DateTime currentDate = DateTime.now();
     DateTime day = currentDate.subtract(Duration(days: dataCount - 1 - index));
-    String text = '${day.day}/${day.month}';
-    return text;
+    String formattedDate = DateFormat('MMM dd, yyyy').format(day);
+    return formattedDate;
+  }
+
+  Widget statisticsSummary(FlSpot? spot) {
+    if (spot == null) {
+      return SizedBox(
+          height: 80,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Value",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.67),
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                '\$${(widget.graphData.last['value'].toDouble()).toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.97),
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                selectedTimeFrame == "1W"
+                    ? "Last 7 days"
+                    : selectedTimeFrame == "1M"
+                        ? "Last 30 days"
+                        : "Last 6 months",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.67),
+                  fontSize: 16,
+                ),
+              )
+            ],
+          ));
+    } else {
+      return SizedBox(
+        height: 80,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Value',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.67),
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              '\$${(spot.y.toDouble() * 1000).toStringAsFixed(2)}',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.97),
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              getDateFromSpot(spot),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.67),
+                fontSize: 16,
+              ),
+            )
+          ],
+        ),
+      );
+    }
   }
 }
