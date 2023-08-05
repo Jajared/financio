@@ -7,10 +7,10 @@ class InvestmentStatistics extends StatefulWidget {
       : super(key: key);
 
   @override
-  _InvestmentStatisticsState createState() => _InvestmentStatisticsState();
+  InvestmentStatisticsState createState() => InvestmentStatisticsState();
 }
 
-class _InvestmentStatisticsState extends State<InvestmentStatistics> {
+class InvestmentStatisticsState extends State<InvestmentStatistics> {
   String selectedTimeFrame = '1W';
 
   @override
@@ -59,7 +59,7 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
         backgroundColor: selectedTimeFrame == timeFrame
             ? const Color.fromRGBO(198, 81, 205, 1)
             : const Color.fromRGBO(56, 56, 56, 1),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         side: BorderSide.none,
       ),
       child: Text(timeFrame),

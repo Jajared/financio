@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 
 class PersonalChart extends StatefulWidget {
   final List<PersonalModel> transactionData;
+  final String timeFrame;
   const PersonalChart({
     Key? key,
     required this.transactionData,
+    required this.timeFrame,
   }) : super(key: key);
   final Color leftBarColor = Colors.green;
   final Color rightBarColor = Colors.red;
@@ -17,10 +19,9 @@ class PersonalChart extends StatefulWidget {
 class PersonalChartState extends State<PersonalChart> {
   final double width = 7;
   double maxY = 50;
-
   late List<BarChartGroupData> rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
-
+  String timeFrame = 'Past week';
   int touchedGroupIndex = -1;
 
   @override
@@ -29,7 +30,18 @@ class PersonalChartState extends State<PersonalChart> {
   }
 
   @override
+  void didUpdateWidget(PersonalChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.timeFrame != widget.timeFrame) {
+      setState(() {
+        timeFrame = widget.timeFrame;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print(timeFrame);
     return FutureBuilder<List<BarChartGroupData>>(
       future: _prepareChartData(),
       builder: (context, snapshot) {

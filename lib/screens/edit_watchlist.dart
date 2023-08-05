@@ -132,7 +132,7 @@ class EditWatchListState extends State<EditWatchList> {
 
   // Function to show the bottom sheet
   void _showUpdateBottomSheet(BuildContext context) {
-    TextEditingController _updateController = TextEditingController();
+    TextEditingController updateController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -154,7 +154,7 @@ class EditWatchListState extends State<EditWatchList> {
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 30),
                   TextField(
-                    controller: _updateController,
+                    controller: updateController,
                     decoration: InputDecoration(
                       hintText: 'Enter update...',
                       focusedBorder: OutlineInputBorder(
@@ -188,7 +188,7 @@ class EditWatchListState extends State<EditWatchList> {
                             flex: 1,
                             child: ElevatedButton(
                               onPressed: () {
-                                String update = _updateController.text.trim();
+                                String update = updateController.text.trim();
                                 if (update.isNotEmpty) {
                                   DescriptionModel newUpdate = DescriptionModel(
                                       description: update,

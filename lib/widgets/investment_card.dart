@@ -16,10 +16,10 @@ class InvestmentCard extends StatefulWidget {
       : super(key: key);
 
   @override
-  _InvestmentCardState createState() => _InvestmentCardState();
+  InvestmentCardState createState() => InvestmentCardState();
 }
 
-class _InvestmentCardState extends State<InvestmentCard> {
+class InvestmentCardState extends State<InvestmentCard> {
   String fullStockName = '';
   String logoUrl = '';
   late String tickerSymbol = '';

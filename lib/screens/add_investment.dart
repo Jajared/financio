@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financio/firebase/activity_collection.dart';
-import 'package:financio/firebase/investment_collection.dart';
 import 'package:financio/models/investment_model.dart';
 import 'package:financio/models/activity_model.dart';
 import 'package:flutter/material.dart';

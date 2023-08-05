@@ -283,6 +283,10 @@ class SellInvestmentState extends State<SellInvestment> {
           content: Text('Error saving transaction'),
         ),
       );
+    } finally {
+      if (quantity == 0) {
+        Navigator.of(context).pop();
+      }
     }
   }
 }

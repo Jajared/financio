@@ -12,11 +12,13 @@ class Personal extends StatefulWidget {
   const Personal({Key? key}) : super(key: key);
 
   @override
-  _PersonalState createState() => _PersonalState();
+  PersonalState createState() => PersonalState();
 }
 
-class _PersonalState extends State<Personal> {
+class PersonalState extends State<Personal> {
   List<PersonalModel> transactionData = [];
+  List<String> timeFrameOptions = ['Past week', 'Past month', 'Past 6 months'];
+  String selectedTimeFrame = 'Past week';
 
   @override
   void initState() {
@@ -78,18 +80,31 @@ class _PersonalState extends State<Personal> {
           children: [
             SizedBox(
                 height: 200,
-                child: PersonalChart(transactionData: transactionData)),
-            CustomButton(
-                icon: Icons.pie_chart,
-                title: "Statistics",
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PersonalStatistics(transactionData: transactionData),
-                    ),
-                  );
-                }),
+                child: PersonalChart(
+                    transactionData: transactionData,
+                    timeFrame: selectedTimeFrame)),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(children: [
+                  CustomButton(
+                      icon: Icons.calendar_month,
+                      title: "Timeframe",
+                      onPressed: () {
+                        _showTimeFramePicker(context);
+                      }),
+                  const SizedBox(width: 10),
+                  CustomButton(
+                      icon: Icons.pie_chart,
+                      title: "Statistics",
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => PersonalStatistics(
+                                transactionData: transactionData),
+                          ),
+                        );
+                      })
+                ])),
             const Align(
               alignment: Alignment.topLeft,
               child: Padding(
@@ -124,7 +139,6 @@ class _PersonalState extends State<Personal> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            // Navigate to the page where you want to add a new transaction
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => AddTransaction(
@@ -201,6 +215,46 @@ class _PersonalState extends State<Personal> {
           },
         ),
       ],
+    );
+  }
+
+  void _showTimeFramePicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: const Color.fromRGBO(16, 16, 16, 1),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: timeFrameOptions.length,
+            itemBuilder: (context, index) {
+              final timeFrame = timeFrameOptions[index];
+              return ListTile(
+                leading: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: timeFrame == selectedTimeFrame
+                        ? const Color.fromRGBO(198, 81, 205, 1)
+                        : Colors.transparent,
+                  ),
+                ),
+                title: Text(
+                  timeFrame,
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  setState(() {
+                    selectedTimeFrame = timeFrame;
+                  });
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

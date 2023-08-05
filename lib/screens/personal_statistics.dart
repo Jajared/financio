@@ -8,10 +8,10 @@ class PersonalStatistics extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PersonalStatisticsState createState() => _PersonalStatisticsState();
+  PersonalStatisticsState createState() => PersonalStatisticsState();
 }
 
-class _PersonalStatisticsState extends State<PersonalStatistics> {
+class PersonalStatisticsState extends State<PersonalStatistics> {
   String _statisticsType = 'Income';
   List<PersonalModel> _filteredTransactionData = [];
   List<MapEntry<String, double>> _categorisedTransactionData = [];
@@ -129,12 +129,14 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
     );
   }
 
+  // Filter transactions by type (income or expenses)
   filterTransactionByType(String type, List<PersonalModel> transactionData) {
     return transactionData
         .where((item) => type == "Income" ? item.amount > 0 : item.amount < 0)
         .toList();
   }
 
+  // Filter transactions by date
   filterTransactionByDate(
       String timeFrame, List<PersonalModel> transactionData) {
     var now = DateTime.now();
