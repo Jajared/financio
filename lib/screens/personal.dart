@@ -17,8 +17,8 @@ class Personal extends StatefulWidget {
 
 class PersonalState extends State<Personal> {
   List<PersonalModel> transactionData = [];
-  List<String> timeFrameOptions = ['Past week', 'Past month', 'Past 6 months'];
-  String selectedTimeFrame = 'Past week';
+  List<String> timeFrameOptions = ['Day', 'Week', 'Month'];
+  String selectedTimeFrame = 'Week';
 
   @override
   void initState() {
@@ -224,35 +224,51 @@ class PersonalState extends State<Personal> {
       builder: (BuildContext context) {
         return Container(
           color: const Color.fromRGBO(16, 16, 16, 1),
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: timeFrameOptions.length,
-            itemBuilder: (context, index) {
-              final timeFrame = timeFrameOptions[index];
-              return ListTile(
-                leading: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: timeFrame == selectedTimeFrame
-                        ? const Color.fromRGBO(198, 81, 205, 1)
-                        : Colors.transparent,
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16.0), // Adjust the padding as needed
+                  child: Text(
+                    "Select Timeframe",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(255, 255, 255, 0.96),
+                    ),
                   ),
                 ),
-                title: Text(
-                  timeFrame,
-                  style: TextStyle(color: Colors.white),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: timeFrameOptions.length,
+                  itemBuilder: (context, index) {
+                    final timeFrame = timeFrameOptions[index];
+                    return ListTile(
+                      trailing: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: timeFrame == selectedTimeFrame
+                              ? const Color.fromRGBO(198, 81, 205, 1)
+                              : Colors.transparent,
+                        ),
+                      ),
+                      title: Text(
+                        timeFrame,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          selectedTimeFrame = timeFrame;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
                 ),
-                onTap: () {
-                  setState(() {
-                    selectedTimeFrame = timeFrame;
-                  });
-                  Navigator.pop(context);
-                },
-              );
-            },
-          ),
+              ]),
         );
       },
     );

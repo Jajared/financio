@@ -1,6 +1,7 @@
 import 'package:financio/models/personal_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PersonalChart extends StatefulWidget {
   final List<PersonalModel> transactionData;
@@ -21,7 +22,7 @@ class PersonalChartState extends State<PersonalChart> {
   double maxY = 50;
   late List<BarChartGroupData> rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
-  String timeFrame = 'Past week';
+  String timeFrame = 'Week';
   int touchedGroupIndex = -1;
 
   @override
@@ -41,7 +42,6 @@ class PersonalChartState extends State<PersonalChart> {
 
   @override
   Widget build(BuildContext context) {
-    print(timeFrame);
     return FutureBuilder<List<BarChartGroupData>>(
       future: _prepareChartData(),
       builder: (context, snapshot) {
@@ -145,7 +145,7 @@ class PersonalChartState extends State<PersonalChart> {
                             sideTitles: SideTitles(
                               showTitles: true,
                               reservedSize: 28,
-                              interval: maxY / 5,
+                              interval: 200 / 5,
                               getTitlesWidget: leftTitles,
                             ),
                           ),
@@ -156,7 +156,7 @@ class PersonalChartState extends State<PersonalChart> {
                         barGroups: showingBarGroups,
                         gridData: FlGridData(
                           show: true,
-                          horizontalInterval: maxY / 5, // Fix scaling
+                          horizontalInterval: 200 / 5,
                           checkToShowVerticalLine: (value) => false,
                           checkToShowHorizontalLine: (value) => true,
                           getDrawingHorizontalLine: (value) {
@@ -192,7 +192,35 @@ class PersonalChartState extends State<PersonalChart> {
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    final titles = <String>['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    List<String> getDataTitles(String selectedTimeFrame) {
+      final currentDate = DateTime.now();
+      final titles = <String>[];
+
+      if (selectedTimeFrame == 'Week') {
+        // Get last 7 weeks
+        for (int i = 6; i >= 0; i--) {
+          final weekDate = currentDate.subtract(Duration(days: (i + 1) * 7));
+          titles.add('${weekDate.day}/${weekDate.month}');
+        }
+      } else if (selectedTimeFrame == 'Day') {
+        // Get last 7 days
+        for (int i = 6; i >= 0; i--) {
+          final dayDate = currentDate.subtract(Duration(days: i));
+          titles.add('${dayDate.day}/${dayDate.month}');
+        }
+      } else if (selectedTimeFrame == 'Month') {
+        // Get last 7 months
+        for (int i = 6; i >= 0; i--) {
+          final monthDate = currentDate.subtract(Duration(days: i * 30));
+          final formattedMonth = DateFormat('MMM').format(monthDate);
+          titles.add(formattedMonth);
+        }
+      }
+
+      return titles;
+    }
+
+    final titles = getDataTitles(timeFrame);
 
     final Widget text = Text(
       titles[value.toInt()],
@@ -232,66 +260,119 @@ class PersonalChartState extends State<PersonalChart> {
   Future<List<BarChartGroupData>> _prepareChartData() async {
     final List<PersonalModel> transactionData = widget.transactionData;
     final List<BarChartGroupData> barGroups =
-        convertTransactionToChartData(transactionData);
+        convertTransactionToChartData(transactionData, timeFrame);
     await Future.delayed(
         const Duration(milliseconds: 500)); // Simulating async operations.
     return barGroups;
   }
 
-  convertTransactionToChartData(List<PersonalModel> transactionData) {
-    final List<BarChartGroupData> barGroups = [];
+  List<BarChartGroupData> convertTransactionToChartData(
+      List<PersonalModel> transactionData, String selectedTimeFrame) {
     // Sort transactions by timestamp in descending order (most recent first)
     transactionData.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
-    // Limit the transactions to the latest 7 days
-    final int numberOfDaysToShow = 7;
+    // Determine the number of days to show based on the selected timeframe
+    late int numberOfDaysToShow;
+    if (selectedTimeFrame == 'Week') {
+      numberOfDaysToShow = 7 * 7; // Show data for the past 7 weeks
+    } else if (selectedTimeFrame == 'Day') {
+      numberOfDaysToShow = 7; // Show data for the past 7 days
+    } else if (selectedTimeFrame == 'Month') {
+      numberOfDaysToShow = 7 * 30; // Show data for the past 7 months
+    }
+
+    // Limit the transactions to the selected timeframe
     final DateTime today = DateTime.now();
-    final DateTime sevenDaysAgo =
+    final DateTime timeFrameStartDate =
         today.subtract(Duration(days: numberOfDaysToShow));
-    final DateTime startDate = DateTime(
-        sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day, 0, 0, 0, 0, 0);
-    final List<PersonalModel> latestTransactions = transactionData
+    final DateTime startDate = DateTime(timeFrameStartDate.year,
+        timeFrameStartDate.month, timeFrameStartDate.day, 0, 0, 0, 0, 0);
+    final List<PersonalModel> selectedTimeFrameTransactions = transactionData
         .where(
             (transaction) => transaction.timestamp.toDate().isAfter(startDate))
         .toList();
-    // Group the latest transactions by date
-    final Map<String, List<double>> groupedData = {};
-    for (final transaction in latestTransactions) {
-      final date = transaction.timestamp
-          .toDate()
-          .toString()
-          .split(' ')[0]; // Ext32ract date in 'yyyy-MM-dd' format
-      if (groupedData.containsKey(date)) {
-        groupedData[date]!.add(transaction.amount);
+
+    // Group the selected transactions by date
+    final Map<DateTime, List<double>> groupedData = {};
+    for (final transaction in selectedTimeFrameTransactions) {
+      final date = transaction.timestamp.toDate();
+      final dateKey = DateTime(date.year, date.month, date.day);
+      if (groupedData.containsKey(dateKey)) {
+        groupedData[dateKey]!.add(transaction.amount);
       } else {
-        groupedData[date] = [transaction.amount];
+        groupedData[dateKey] = [transaction.amount];
       }
     }
 
-    final List<MapEntry<String, List<double>>> sortedEntries =
-        groupedData.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
-    int startIndex = sortedEntries.length > 7
-        ? sortedEntries.length - 7
-        : sortedEntries.length - 1;
-
-    // Create BarChartGroupData from the grouped data
-    for (int i = startIndex; i >= 0; i--) {
-      final amounts = sortedEntries[i].value;
-      double expenseAmount = 0;
-      double incomeAmount = 0;
-      for (final amount in amounts) {
-        if (amount < 0) {
-          expenseAmount += amount;
-        } else {
-          incomeAmount += amount;
+    // Map to store aggregated data
+    late Map<DateTime, double> aggregatedData;
+    if (selectedTimeFrame == "Day") {
+      aggregatedData = {};
+      for (int i = 0; i < 7; i++) {
+        final DateTime selectedDate = today.subtract(Duration(days: i));
+        final DateTime dateKey =
+            DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+        // Filter data that lies within the day
+        double dayTotal = 0;
+        for (final entry in groupedData.entries) {
+          final DateTime date = entry.key;
+          if (date.isAtSameMomentAs(dateKey)) {
+            final double totalAmount =
+                entry.value.reduce((sum, amount) => sum + amount);
+            dayTotal += totalAmount;
+          }
         }
+        aggregatedData[dateKey] = dayTotal;
       }
-      final barGroup =
-          makeGroupData(6 + i - startIndex, incomeAmount, -expenseAmount);
-      barGroups.insert(0, barGroup);
+    } else if (selectedTimeFrame == "Week") {
+      aggregatedData = {};
+      for (int i = 0; i < 7; i++) {
+        final DateTime weekStartDate =
+            today.subtract(Duration(days: (i + 1) * 7));
+        final DateTime weekEndDate = today.subtract(Duration(days: i * 7));
+        // Filter data that lies within the week
+        double weekTotal = 0;
+        for (final entry in groupedData.entries) {
+          final DateTime dateKey = entry.key;
+          if (dateKey.isAfter(weekStartDate) && dateKey.isBefore(weekEndDate)) {
+            final double totalAmount =
+                entry.value.reduce((sum, amount) => sum + amount);
+            weekTotal += totalAmount;
+          }
+        }
+        aggregatedData[weekStartDate] = weekTotal;
+      }
+    } else if (selectedTimeFrame == "Month") {
+      aggregatedData = {};
+      for (int i = 0; i < 7; i++) {
+        final DateTime currentDate = today.subtract(Duration(days: i * 30));
+        final DateTime monthStartDate =
+            DateTime(currentDate.year, currentDate.month, 1);
+        final DateTime monthEndDate =
+            DateTime(currentDate.year, currentDate.month + 1, 1)
+                .subtract(const Duration(days: 1));
+
+        // Filter data that lies within the month
+        double monthTotal = 0;
+        for (final entry in groupedData.entries) {
+          final DateTime dateKey = entry.key;
+          if (dateKey.isAfter(monthStartDate) &&
+              dateKey.isBefore(monthEndDate)) {
+            final double totalAmount =
+                entry.value.reduce((sum, amount) => sum + amount);
+            monthTotal += totalAmount;
+          }
+        }
+        aggregatedData[monthStartDate] = monthTotal;
+      }
     }
-    while (barGroups.length < 7) {
-      barGroups.insert(0, makeGroupData(6 - barGroups.length, 0, 0));
+
+    // Create BarChartGroupData from the aggregated data and fill with empty data for missing dates
+    List<MapEntry<DateTime, double>> dataList = aggregatedData.entries.toList();
+    List<BarChartGroupData> barGroups = [];
+    for (int i = 0; i < dataList.length; i++) {
+      final double amount = dataList[i].value;
+      barGroups.insert(0, makeGroupData(6 - i, 0, -amount));
     }
 
     return barGroups;
