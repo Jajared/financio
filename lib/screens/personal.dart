@@ -80,9 +80,7 @@ class PersonalState extends State<Personal> {
           children: [
             SizedBox(
                 height: 200,
-                child: PersonalChart(
-                    transactionData: transactionData,
-                    timeFrame: selectedTimeFrame)),
+                child: PersonalChart(timeFrame: selectedTimeFrame)),
             Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(children: [

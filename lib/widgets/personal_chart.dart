@@ -1,14 +1,13 @@
+import 'package:financio/firebase/personal_collection.dart';
 import 'package:financio/models/personal_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class PersonalChart extends StatefulWidget {
-  final List<PersonalModel> transactionData;
   final String timeFrame;
   const PersonalChart({
     Key? key,
-    required this.transactionData,
     required this.timeFrame,
   }) : super(key: key);
   final Color leftBarColor = Colors.green;
@@ -24,10 +23,12 @@ class PersonalChartState extends State<PersonalChart> {
   late List<BarChartGroupData> showingBarGroups;
   String timeFrame = 'Week';
   int touchedGroupIndex = -1;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _prepareChartData();
   }
 
   @override
@@ -36,145 +37,119 @@ class PersonalChartState extends State<PersonalChart> {
     if (oldWidget.timeFrame != widget.timeFrame) {
       setState(() {
         timeFrame = widget.timeFrame;
+        _prepareChartData();
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<BarChartGroupData>>(
-      future: _prepareChartData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // While waiting for the futures to complete, show a loading indicator.
-          return const Center(
-              child: CircularProgressIndicator(
-                  color: Color.fromRGBO(135, 57, 249, 1)));
-        } else if (snapshot.hasError) {
-          // If an error occurred while fetching data, display an error message.
-          return const Center(child: Text('Error loading data'));
-        } else {
-          // The futures have completed successfully, and the chart data is available in snapshot.data.
-          final List<BarChartGroupData> barGroups = snapshot.data ?? [];
-          maxY = getMaxTransactionValue(barGroups);
-          showingBarGroups = barGroups;
-          rawBarGroups = showingBarGroups;
-          return AspectRatio(
-            aspectRatio: 1.7,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Expanded(
-                    child: BarChart(
-                      BarChartData(
-                        maxY: maxY,
-                        barTouchData: BarTouchData(
-                          touchTooltipData: BarTouchTooltipData(
-                            tooltipBgColor: Colors.grey,
-                            getTooltipItem: (a, b, c, d) => null,
-                          ),
-                          touchCallback: (FlTouchEvent event, response) {
-                            if (response == null || response.spot == null) {
-                              setState(() {
-                                touchedGroupIndex = -1;
-                                showingBarGroups = List.of(rawBarGroups);
-                              });
-                              return;
-                            }
+    if (isLoading || showingBarGroups.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return AspectRatio(
+      aspectRatio: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Expanded(
+              child: BarChart(
+                BarChartData(
+                  maxY: maxY,
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      tooltipBgColor: Colors.grey,
+                      getTooltipItem: (a, b, c, d) => null,
+                    ),
+                    touchCallback: (FlTouchEvent event, response) {
+                      if (response == null || response.spot == null) {
+                        setState(() {
+                          touchedGroupIndex = -1;
+                          showingBarGroups = List.of(rawBarGroups);
+                        });
+                        return;
+                      }
 
-                            touchedGroupIndex =
-                                response.spot!.touchedBarGroupIndex;
+                      touchedGroupIndex = response.spot!.touchedBarGroupIndex;
+                      setState(() {
+                        if (!event.isInterestedForInteractions) {
+                          touchedGroupIndex = -1;
+                          showingBarGroups = List.of(rawBarGroups);
+                          return;
+                        }
 
-                            setState(() {
-                              if (!event.isInterestedForInteractions) {
-                                touchedGroupIndex = -1;
-                                showingBarGroups = List.of(rawBarGroups);
-                                return;
-                              }
-                              showingBarGroups = List.of(rawBarGroups);
-                              if (touchedGroupIndex != -1) {
-                                var sum = 0.0;
-                                final barData =
-                                    showingBarGroups[touchedGroupIndex].barRods;
-                                for (final rod in barData) {
-                                  sum += rod.toY;
-                                }
-                                var avg = 0.0;
-                                if (barData[0].toY == 0 ||
-                                    barData[1].toY == 0) {
-                                  avg = barData[0].toY == 0
-                                      ? barData[1].toY
-                                      : barData[0].toY;
-                                } else {
-                                  avg = sum / barData.length;
-                                }
-                                final nettColor =
-                                    barData[0].toY > barData[1].toY
-                                        ? Colors.green
-                                        : Colors.red;
-                                showingBarGroups[touchedGroupIndex] =
-                                    showingBarGroups[touchedGroupIndex]
-                                        .copyWith(
-                                  barRods: barData.map((rod) {
-                                    return rod.copyWith(
-                                        toY: avg, color: nettColor);
-                                  }).toList(),
-                                );
-                              }
-                            });
-                          },
-                        ),
-                        titlesData: FlTitlesData(
-                          show: true,
-                          rightTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false),
-                          ),
-                          topTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false),
-                          ),
-                          bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              getTitlesWidget: bottomTitles,
-                              reservedSize: 42,
-                            ),
-                          ),
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 28,
-                              interval: 200 / 5,
-                              getTitlesWidget: leftTitles,
-                            ),
-                          ),
-                        ),
-                        borderData: FlBorderData(
-                          show: false,
-                        ),
-                        barGroups: showingBarGroups,
-                        gridData: FlGridData(
-                          show: true,
-                          horizontalInterval: 200 / 5,
-                          checkToShowVerticalLine: (value) => false,
-                          checkToShowHorizontalLine: (value) => true,
-                          getDrawingHorizontalLine: (value) {
-                            return const FlLine(
-                                strokeWidth: 0.8,
-                                color: Color(0xffe7e8ec),
-                                dashArray: [5, 10]);
-                          },
-                        ),
+                        showingBarGroups = List.of(rawBarGroups);
+
+                        if (touchedGroupIndex != -1) {
+                          final barData =
+                              showingBarGroups[touchedGroupIndex].barRods;
+                          if (barData.length >= 2) {
+                            final double income = barData[0].toY;
+                            final double expense = barData[1].toY;
+                            final double average = (income + expense) / 2;
+                            final Color averageColor =
+                                income > expense ? Colors.green : Colors.red;
+                            showingBarGroups[touchedGroupIndex] =
+                                showingBarGroups[touchedGroupIndex].copyWith(
+                                    barRods: barData.map((rod) {
+                              return rod.copyWith(
+                                  toY: average, color: averageColor);
+                            }).toList());
+                          }
+                        }
+                      });
+                    },
+                  ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: bottomTitles,
+                        reservedSize: 50,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        interval: maxY / 5,
+                        getTitlesWidget: leftTitles,
                       ),
                     ),
                   ),
-                ],
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  barGroups: showingBarGroups,
+                  gridData: FlGridData(
+                    show: true,
+                    horizontalInterval: maxY / 5,
+                    checkToShowVerticalLine: (value) => false,
+                    checkToShowHorizontalLine: (value) => true,
+                    getDrawingHorizontalLine: (value) {
+                      return const FlLine(
+                          strokeWidth: 0.8,
+                          color: Color(0xffe7e8ec),
+                          dashArray: [5, 10]);
+                    },
+                  ),
+                ),
               ),
             ),
-          );
-        }
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -182,7 +157,7 @@ class PersonalChartState extends State<PersonalChart> {
     const style = TextStyle(
       color: Color(0xff7589a2),
       fontWeight: FontWeight.bold,
-      fontSize: 14,
+      fontSize: 12,
     );
     return SideTitleWidget(
       axisSide: meta.axisSide,
@@ -197,16 +172,22 @@ class PersonalChartState extends State<PersonalChart> {
       final titles = <String>[];
 
       if (selectedTimeFrame == 'Week') {
+        final startofWeek = getStartOfWeek(currentDate);
         // Get last 7 weeks
-        for (int i = 6; i >= 0; i--) {
-          final weekDate = currentDate.subtract(Duration(days: (i + 1) * 7));
-          titles.add('${weekDate.day}/${weekDate.month}');
+        for (int i = 4; i >= 0; i--) {
+          final weekDate = startofWeek.subtract(Duration(days: i * 7));
+          final formattedStartDate = DateFormat('MMM dd').format(weekDate);
+          final formattedEndDate = DateFormat('MMM dd')
+              .format(weekDate.add(const Duration(days: 6)));
+          titles.add('$formattedStartDate\n$formattedEndDate');
         }
       } else if (selectedTimeFrame == 'Day') {
         // Get last 7 days
         for (int i = 6; i >= 0; i--) {
           final dayDate = currentDate.subtract(Duration(days: i));
-          titles.add('${dayDate.day}/${dayDate.month}');
+          final formattedDate = DateFormat('dd').format(dayDate);
+          final formattedMonth = DateFormat('MMM').format(dayDate);
+          titles.add("$formattedDate\n$formattedMonth");
         }
       } else if (selectedTimeFrame == 'Month') {
         // Get last 7 months
@@ -222,18 +203,21 @@ class PersonalChartState extends State<PersonalChart> {
 
     final titles = getDataTitles(timeFrame);
 
-    final Widget text = Text(
-      titles[value.toInt()],
-      style: const TextStyle(
-        color: Color(0xff7589a2),
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
+    final Widget text = Center(
+      child: Text(
+        titles[value.toInt()],
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Color(0xff7589a2),
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
       ),
     );
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      space: 16,
+      space: 15,
       child: text,
     );
   }
@@ -257,24 +241,30 @@ class PersonalChartState extends State<PersonalChart> {
     );
   }
 
-  Future<List<BarChartGroupData>> _prepareChartData() async {
-    final List<PersonalModel> transactionData = widget.transactionData;
+  Future<void> _prepareChartData() async {
+    setState(() {
+      isLoading = true;
+    });
+    final List<PersonalModel> transactionData =
+        await PersonalCollection.instance.getAllPersonal();
     final List<BarChartGroupData> barGroups =
-        convertTransactionToChartData(transactionData, timeFrame);
-    await Future.delayed(
-        const Duration(milliseconds: 500)); // Simulating async operations.
-    return barGroups;
+        await convertTransactionToChartData(transactionData, timeFrame);
+    setState(() {
+      maxY = getMaxTransactionValue(barGroups);
+      rawBarGroups = barGroups;
+      showingBarGroups = rawBarGroups;
+      isLoading = false;
+    });
   }
 
-  List<BarChartGroupData> convertTransactionToChartData(
-      List<PersonalModel> transactionData, String selectedTimeFrame) {
+  Future<List<BarChartGroupData>> convertTransactionToChartData(
+      List<PersonalModel> transactionData, String selectedTimeFrame) async {
     // Sort transactions by timestamp in descending order (most recent first)
     transactionData.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
     // Determine the number of days to show based on the selected timeframe
     late int numberOfDaysToShow;
     if (selectedTimeFrame == 'Week') {
-      numberOfDaysToShow = 7 * 7; // Show data for the past 7 weeks
+      numberOfDaysToShow = 5 * 7; // Show data for the past 7 weeks
     } else if (selectedTimeFrame == 'Day') {
       numberOfDaysToShow = 7; // Show data for the past 7 days
     } else if (selectedTimeFrame == 'Month') {
@@ -304,8 +294,8 @@ class PersonalChartState extends State<PersonalChart> {
       }
     }
 
-    // Map to store aggregated data
-    late Map<DateTime, double> aggregatedData;
+    // Map to store aggregated data (income and expense must be seperated)
+    late Map<DateTime, Map<String, double>> aggregatedData;
     if (selectedTimeFrame == "Day") {
       aggregatedData = {};
       for (int i = 0; i < 7; i++) {
@@ -313,34 +303,51 @@ class PersonalChartState extends State<PersonalChart> {
         final DateTime dateKey =
             DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
         // Filter data that lies within the day
-        double dayTotal = 0;
+        double dayIncomeTotal = 0;
+        double dayExpenseTotal = 0;
         for (final entry in groupedData.entries) {
           final DateTime date = entry.key;
           if (date.isAtSameMomentAs(dateKey)) {
-            final double totalAmount =
-                entry.value.reduce((sum, amount) => sum + amount);
-            dayTotal += totalAmount;
+            for (final transaction in entry.value) {
+              if (transaction > 0) {
+                dayIncomeTotal += transaction;
+              } else {
+                dayExpenseTotal += -transaction;
+              }
+            }
           }
         }
-        aggregatedData[dateKey] = dayTotal;
+        aggregatedData[dateKey] = {
+          "income": dayIncomeTotal,
+          "expense": dayExpenseTotal
+        };
       }
     } else if (selectedTimeFrame == "Week") {
       aggregatedData = {};
-      for (int i = 0; i < 7; i++) {
+      final startOfWeek = getStartOfWeek(today);
+      for (int i = 0; i < 5; i++) {
         final DateTime weekStartDate =
-            today.subtract(Duration(days: (i + 1) * 7));
-        final DateTime weekEndDate = today.subtract(Duration(days: i * 7));
+            startOfWeek.subtract(Duration(days: i * 7));
+        final DateTime weekEndDate = weekStartDate.add(const Duration(days: 6));
         // Filter data that lies within the week
-        double weekTotal = 0;
+        double weekIncomeTotal = 0;
+        double weekExpenseTotal = 0;
         for (final entry in groupedData.entries) {
           final DateTime dateKey = entry.key;
           if (dateKey.isAfter(weekStartDate) && dateKey.isBefore(weekEndDate)) {
-            final double totalAmount =
-                entry.value.reduce((sum, amount) => sum + amount);
-            weekTotal += totalAmount;
+            for (final transaction in entry.value) {
+              if (transaction > 0) {
+                weekIncomeTotal += transaction;
+              } else {
+                weekExpenseTotal += -transaction;
+              }
+            }
           }
         }
-        aggregatedData[weekStartDate] = weekTotal;
+        aggregatedData[weekStartDate] = {
+          "income": weekIncomeTotal,
+          "expense": weekExpenseTotal
+        };
       }
     } else if (selectedTimeFrame == "Month") {
       aggregatedData = {};
@@ -353,26 +360,37 @@ class PersonalChartState extends State<PersonalChart> {
                 .subtract(const Duration(days: 1));
 
         // Filter data that lies within the month
-        double monthTotal = 0;
+        double monthIncomeTotal = 0;
+        double monthExpenseTotal = 0;
         for (final entry in groupedData.entries) {
           final DateTime dateKey = entry.key;
           if (dateKey.isAfter(monthStartDate) &&
               dateKey.isBefore(monthEndDate)) {
-            final double totalAmount =
-                entry.value.reduce((sum, amount) => sum + amount);
-            monthTotal += totalAmount;
+            for (final transaction in entry.value) {
+              if (transaction > 0) {
+                monthIncomeTotal += transaction;
+              } else {
+                monthExpenseTotal += -transaction;
+              }
+            }
           }
         }
-        aggregatedData[monthStartDate] = monthTotal;
+        aggregatedData[monthStartDate] = {
+          "income": monthIncomeTotal,
+          "expense": monthExpenseTotal
+        };
       }
     }
 
     // Create BarChartGroupData from the aggregated data and fill with empty data for missing dates
-    List<MapEntry<DateTime, double>> dataList = aggregatedData.entries.toList();
+    List<MapEntry<DateTime, Map<String, double>>> dataList =
+        aggregatedData.entries.toList();
     List<BarChartGroupData> barGroups = [];
     for (int i = 0; i < dataList.length; i++) {
-      final double amount = dataList[i].value;
-      barGroups.insert(0, makeGroupData(6 - i, 0, -amount));
+      final double incomeAmount = dataList[i].value["income"] ?? 0;
+      final double expenseAmount = dataList[i].value["expense"] ?? 0;
+      barGroups.insert(0,
+          makeGroupData(dataList.length - 1 - i, incomeAmount, expenseAmount));
     }
 
     return barGroups;
@@ -381,13 +399,21 @@ class PersonalChartState extends State<PersonalChart> {
   double getMaxTransactionValue(List<BarChartGroupData> barGroups) {
     double max = 0;
     for (final barGroup in barGroups) {
-      final barData = barGroup.barRods;
-      for (final rod in barData) {
-        if (rod.toY > max) {
-          max = rod.toY;
+      for (final barRod in barGroup.barRods) {
+        if (barRod.toY > max) {
+          max = barRod.toY;
         }
       }
     }
     return max;
+  }
+
+  DateTime getStartOfWeek(DateTime date) {
+    int daysSinceMonday = date.weekday - DateTime.monday;
+    if (daysSinceMonday >= 0) {
+      return date.subtract(Duration(days: daysSinceMonday));
+    } else {
+      return date.subtract(Duration(days: date.weekday + 1));
+    }
   }
 }
