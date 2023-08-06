@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financio/firebase/activity_collection.dart';
-import 'package:financio/firebase/investment_collection.dart';
 import 'package:financio/models/investment_model.dart';
 import 'package:financio/models/activity_model.dart';
 import 'package:flutter/material.dart';
@@ -213,7 +212,7 @@ class AddInvestmentState extends State<AddInvestment> {
     );
     try {
       await ActivityCollection.instance.addActivity(newActivity);
-      await InvestmentCollection.instance.addInvestment(newInvestment);
+      await widget.addInvestment(newInvestment);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -221,7 +220,6 @@ class AddInvestmentState extends State<AddInvestment> {
         ),
       );
     }
-    widget.addInvestment(newInvestment);
   }
 
   // Load ticker symbols from JSON file

@@ -15,7 +15,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 35,
+      height: 30,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
       ),
@@ -33,14 +33,14 @@ class CustomButton extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 24,
+              size: 20,
               color: const Color.fromRGBO(198, 81, 205, 1),
             ),
             const SizedBox(width: 4),
             Text(
               title,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.white,
               ),
             ),

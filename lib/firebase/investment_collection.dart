@@ -13,7 +13,7 @@ class InvestmentCollection extends GetxController {
     getAllInvestment();
   }
 
-  Future<void> addInvestment(InvestmentModel event) async {
+  Future<List<InvestmentModel>> addInvestment(InvestmentModel event) async {
     DocumentSnapshot snapshot = await investmentRef.doc("test").get();
     Map<String, dynamic> currentData = snapshot.data() as Map<String, dynamic>;
 
@@ -79,9 +79,11 @@ class InvestmentCollection extends GetxController {
       'summary': currentData['summary'],
     };
 
-    return investmentRef
-        .doc("test")
-        .set(newInvestmentData, SetOptions(merge: true));
+    investmentRef.doc("test").set(newInvestmentData, SetOptions(merge: true));
+
+    return currentData['holdings']
+        .map<InvestmentModel>((item) => InvestmentModel.fromJson(item))
+        .toList();
   }
 
   Future<List<InvestmentModel>> sellInvestment(InvestmentModel event) async {

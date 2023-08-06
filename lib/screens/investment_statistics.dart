@@ -7,10 +7,10 @@ class InvestmentStatistics extends StatefulWidget {
       : super(key: key);
 
   @override
-  _InvestmentStatisticsState createState() => _InvestmentStatisticsState();
+  InvestmentStatisticsState createState() => InvestmentStatisticsState();
 }
 
-class _InvestmentStatisticsState extends State<InvestmentStatistics> {
+class InvestmentStatisticsState extends State<InvestmentStatistics> {
   String selectedTimeFrame = '1W';
 
   @override
@@ -31,6 +31,10 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 10),
+          InvestmentChart(
+              graphData: widget.graphData, timeFrame: selectedTimeFrame),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -39,8 +43,6 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
               _buildTimeFrameButton('6M'),
             ],
           ),
-          const SizedBox(height: 20),
-          InvestmentChart(graphData: widget.graphData),
         ],
       ),
     );
@@ -52,15 +54,12 @@ class _InvestmentStatisticsState extends State<InvestmentStatistics> {
         setState(() {
           selectedTimeFrame = timeFrame;
         });
-        // Add your logic to handle changing the time frame in the chart
-        // You can use the selectedTimeFrame variable here to determine the selected option.
-        // For example, you can pass this value to your InvestmentChart widget to update the data accordingly.
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: selectedTimeFrame == timeFrame
             ? const Color.fromRGBO(198, 81, 205, 1)
             : const Color.fromRGBO(56, 56, 56, 1),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         side: BorderSide.none,
       ),
       child: Text(timeFrame),

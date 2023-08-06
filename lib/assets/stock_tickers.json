@@ -15320,6 +15320,11 @@
     "Exchange": "NASDAQ"
   },
   {
+    "Ticker": "AAL",
+    "Name": "American Airlines Group Inc",
+    "Exchange": "NASDAQ"
+  },
+  {
     "Ticker": "AAME",
     "Name": "Atlantic American Corp.",
     "Exchange": "NASDAQ"

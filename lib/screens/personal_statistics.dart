@@ -8,19 +8,24 @@ class PersonalStatistics extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PersonalStatisticsState createState() => _PersonalStatisticsState();
+  PersonalStatisticsState createState() => PersonalStatisticsState();
 }
 
-class _PersonalStatisticsState extends State<PersonalStatistics> {
+class PersonalStatisticsState extends State<PersonalStatistics> {
   String _statisticsType = 'Income';
   List<PersonalModel> _filteredTransactionData = [];
+  List<MapEntry<String, double>> _categorisedTransactionData = [];
   String selectedTimeFrame = '1W';
 
   @override
   void initState() {
     super.initState();
-    _filteredTransactionData =
+    var filteredByType =
         filterTransactionByType(_statisticsType, widget.transactionData);
+    _filteredTransactionData =
+        filterTransactionByDate(selectedTimeFrame, filteredByType);
+    _categorisedTransactionData =
+        categoriseTransaction(_filteredTransactionData);
   }
 
   @override
@@ -58,8 +63,12 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
                 onPressed: (index) {
                   setState(() {
                     _statisticsType = index == 0 ? "Income" : "Expenses";
-                    _filteredTransactionData = filterTransactionByType(
+                    var temp = filterTransactionByType(
                         _statisticsType, widget.transactionData);
+                    _filteredTransactionData =
+                        filterTransactionByDate(selectedTimeFrame, temp);
+                    _categorisedTransactionData =
+                        categoriseTransaction(_filteredTransactionData);
                   });
                 },
                 children: const [
@@ -88,16 +97,30 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
               _buildTimeFrameButton('6M'),
             ],
           ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Text(
+              selectedTimeFrame == '1W'
+                  ? 'Past week'
+                  : selectedTimeFrame == '1M'
+                      ? 'Past month'
+                      : 'Past 6 months',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.96),
+                fontSize: 14,
+              ),
+            ),
+          ),
           const SizedBox(height: 10),
           Expanded(
             flex: 1,
             child: ListView.builder(
-              itemCount: _filteredTransactionData.length,
+              itemCount: _categorisedTransactionData.length,
               itemBuilder: (context, index) {
-                return _buildListItem(
-                  _filteredTransactionData[index].category,
-                  _filteredTransactionData[index].amount,
-                );
+                return _buildListItem(_categorisedTransactionData[index].key,
+                    _categorisedTransactionData[index].value);
               },
             ),
           ),
@@ -106,10 +129,51 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
     );
   }
 
+  // Filter transactions by type (income or expenses)
   filterTransactionByType(String type, List<PersonalModel> transactionData) {
     return transactionData
-        .where((item) => type == "Income" ? item.amount < 0 : item.amount > 0)
+        .where((item) => type == "Income" ? item.amount > 0 : item.amount < 0)
         .toList();
+  }
+
+  // Filter transactions by date
+  filterTransactionByDate(
+      String timeFrame, List<PersonalModel> transactionData) {
+    var now = DateTime.now();
+    var pastDate = DateTime.now();
+    switch (timeFrame) {
+      case '1W':
+        pastDate = now.subtract(const Duration(days: 7));
+        break;
+      case '1M':
+        pastDate = now.subtract(const Duration(days: 30));
+        break;
+      case '6M':
+        pastDate = now.subtract(const Duration(days: 180));
+        break;
+      default:
+        pastDate = now.subtract(const Duration(days: 7));
+    }
+    return transactionData
+        .where((item) => item.timestamp.toDate().isAfter(pastDate))
+        .toList();
+  }
+
+  // Group transactions of the same category
+  List<MapEntry<String, double>> categoriseTransaction(
+      List<PersonalModel> transactionData) {
+    var temp = <String, double>{};
+    for (var element in transactionData) {
+      if (temp.containsKey(element.category)) {
+        temp[element.category] = temp[element.category]! + element.amount;
+      } else {
+        temp[element.category] = element.amount;
+      }
+    }
+
+    var sortedEntries = temp.entries.toList()
+      ..sort((a, b) => a.value.compareTo(b.value));
+    return sortedEntries;
   }
 
   Widget _buildListItem(String category, double amount) {
@@ -178,16 +242,19 @@ class _PersonalStatisticsState extends State<PersonalStatistics> {
       onPressed: () {
         setState(() {
           selectedTimeFrame = timeFrame;
+          var temp =
+              filterTransactionByType(_statisticsType, widget.transactionData);
+          _filteredTransactionData =
+              filterTransactionByDate(selectedTimeFrame, temp);
+          _categorisedTransactionData =
+              categoriseTransaction(_filteredTransactionData);
         });
-        // Add your logic to handle changing the time frame in the chart
-        // You can use the selectedTimeFrame variable here to determine the selected option.
-        // For example, you can pass this value to your InvestmentChart widget to update the data accordingly.
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: selectedTimeFrame == timeFrame
             ? const Color.fromRGBO(198, 81, 205, 1)
             : const Color.fromRGBO(56, 56, 56, 1),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         side: BorderSide.none,
       ),
       child: Text(timeFrame),

@@ -9,7 +9,8 @@ class WatchlistItemCard extends StatelessWidget {
   final WatchListModel item;
 
   const WatchlistItemCard(
-      {required this.onDelete,
+      {super.key,
+      required this.onDelete,
       required this.addNewInvestment,
       required this.item});
 

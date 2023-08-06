@@ -14,10 +14,10 @@ class InvestmentSummary extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _InvestmentSummaryState createState() => _InvestmentSummaryState();
+  InvestmentSummaryState createState() => InvestmentSummaryState();
 }
 
-class _InvestmentSummaryState extends State<InvestmentSummary> {
+class InvestmentSummaryState extends State<InvestmentSummary> {
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -12,10 +12,10 @@ class Investments extends StatefulWidget {
   const Investments({Key? key}) : super(key: key);
 
   @override
-  _InvestmentsState createState() => _InvestmentsState();
+  InvestmentsState createState() => InvestmentsState();
 }
 
-class _InvestmentsState extends State<Investments> {
+class InvestmentsState extends State<Investments> {
   List<InvestmentModel> investmentData = [];
   List<dynamic> graphData = [];
   var totalValue = 0.0;
@@ -86,9 +86,11 @@ class _InvestmentsState extends State<Investments> {
     }
   }
 
-  void _onNewInvestmentAdded(InvestmentModel newTransaction) {
+  void _onNewInvestmentAdded(InvestmentModel newTransaction) async {
+    List<InvestmentModel> updatedInvestments =
+        await InvestmentCollection.instance.addInvestment(newTransaction);
     setState(() {
-      investmentData.add(newTransaction);
+      investmentData = updatedInvestments;
     });
     _getSummaryData();
   }
